@@ -7,82 +7,113 @@
   <style>
     *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
     :root{
-      --bg:#f4f3ef;--surface:#fff;--border:#e0ddd4;
+      --bg:#f4f3ef;--surface:#fff;--border:#ddd;
       --text:#1a1a18;--muted:#6b6860;
       --accent:#185FA5;--accent-light:#E6F1FB;--accent-mid:#B5D4F4;
-      --header-bg:#185FA5;--header-text:#fff;
+      --hbg:#185FA5;--htxt:#fff;
       --row-alt:#f9f8f5;--shadow:0 1px 4px rgba(0,0,0,.08);
       --green:#1a7a3a;--green-light:#e6f5ec;
-      --orange:#b55a00;--orange-light:#fff3e6;
+      --red-light:#fde8e8;--red:#a32d2d;
     }
     body{font-family:'Georgia',serif;background:var(--bg);color:var(--text);min-height:100vh}
-    header{background:var(--header-bg);color:var(--header-text);padding:1.2rem 2rem .9rem;display:flex;align-items:flex-end;gap:1rem}
-    header h1{font-size:1.4rem;font-weight:normal;letter-spacing:.04em}
-    header span{font-size:.82rem;opacity:.7;font-family:'Courier New',monospace;padding-bottom:2px}
-    .tabs-bar{background:var(--surface);border-bottom:1px solid var(--border);display:flex;padding:0 2rem}
-    .tab-btn{padding:.8rem 1.4rem;border:none;background:#eae8e3;color:var(--muted);font-family:'Courier New',monospace;font-size:.8rem;letter-spacing:.06em;text-transform:uppercase;cursor:pointer;border-right:1px solid var(--border);border-top:3px solid transparent;transition:background .15s,color .15s;position:relative;top:1px}
+    header{background:var(--hbg);color:var(--htxt);padding:1.1rem 2rem .85rem;display:flex;align-items:flex-end;gap:1rem}
+    header h1{font-size:1.35rem;font-weight:normal;letter-spacing:.04em}
+    header span{font-size:.8rem;opacity:.7;font-family:'Courier New',monospace}
+
+    /* TABS */
+    .tabs-bar{background:#fff;border-bottom:1px solid var(--border);display:flex;padding:0 2rem}
+    .tab-btn{padding:.8rem 1.4rem;border:none;background:#eae8e3;color:var(--muted);font-family:'Courier New',monospace;font-size:.78rem;letter-spacing:.06em;text-transform:uppercase;cursor:pointer;border-right:1px solid var(--border);border-top:3px solid transparent;position:relative;top:1px;transition:background .15s}
     .tab-btn:first-child{border-left:1px solid var(--border)}
     .tab-btn.active{background:#fff;color:var(--accent);border-top:3px solid var(--accent);font-weight:bold}
-    .tab-btn:hover:not(.active){background:#ddd;color:var(--text)}
-    .tab-content{display:none;padding:1.2rem 2rem 3rem}
+    .tab-btn:hover:not(.active){background:#ddd}
+    .tab-content{display:none;padding:1.2rem 1.5rem 3rem}
     .tab-content.active{display:block}
 
-    /* toolbar */
-    .toolbar{display:flex;flex-wrap:wrap;align-items:center;gap:.6rem;margin-bottom:1rem}
-    .toolbar label{font-family:'Courier New',monospace;font-size:.78rem;color:var(--muted)}
-    .toolbar select,.toolbar input[type=number]{
-      font-family:'Courier New',monospace;font-size:.8rem;
-      padding:.3rem .5rem;border:1px solid var(--border);border-radius:4px;
-      background:#fff;color:var(--text);cursor:pointer
-    }
-    .btn{display:inline-flex;align-items:center;gap:.35rem;padding:.38rem .9rem;border:none;border-radius:4px;font-family:'Courier New',monospace;font-size:.78rem;letter-spacing:.04em;cursor:pointer;transition:opacity .15s,transform .1s}
+    /* TOOLBAR */
+    .toolbar{display:flex;flex-wrap:wrap;align-items:center;gap:.5rem;margin-bottom:1rem;padding:.6rem .8rem;background:#fff;border:1px solid var(--border);border-radius:6px}
+    .toolbar label{font-family:'Courier New',monospace;font-size:.75rem;color:var(--muted)}
+    .toolbar select,.toolbar input[type=number]{font-family:'Courier New',monospace;font-size:.78rem;padding:.28rem .45rem;border:1px solid var(--border);border-radius:4px;background:#fff}
+    .btn{display:inline-flex;align-items:center;gap:.3rem;padding:.35rem .85rem;border:none;border-radius:4px;font-family:'Courier New',monospace;font-size:.75rem;letter-spacing:.03em;cursor:pointer;transition:opacity .15s,transform .1s;white-space:nowrap}
     .btn:active{transform:scale(.97)}
-    .btn-init{background:var(--accent);color:#fff}
-    .btn-init:hover{opacity:.88}
-    .btn-save{background:var(--green);color:#fff}
-    .btn-save:hover{opacity:.88}
-    .btn-add{background:var(--orange);color:#fff}
-    .btn-add:hover{opacity:.88}
-    .badge{display:inline-block;padding:.15rem .45rem;border-radius:3px;font-size:.7rem;font-family:'Courier New',monospace;margin-left:.4rem}
+    .btn-blue{background:var(--accent);color:#fff}.btn-blue:hover{opacity:.88}
+    .btn-green{background:var(--green);color:#fff}.btn-green:hover{opacity:.88}
+    .btn-purple{background:#6a3fa0;color:#fff}.btn-purple:hover{opacity:.88}
+    .btn-orange{background:#b55a00;color:#fff}.btn-orange:hover{opacity:.88}
+    .btn-gray{background:#888;color:#fff}.btn-gray:hover{opacity:.88}
+    .badge{display:inline-block;padding:.13rem .4rem;border-radius:3px;font-size:.68rem;font-family:'Courier New',monospace}
     .badge-ok{background:var(--green-light);color:var(--green)}
-    .badge-err{background:#fde8e8;color:#a32d2d}
+    .badge-err{background:var(--red-light);color:var(--red)}
 
-    /* table */
-    .table-wrapper{overflow-x:auto;border-radius:6px;box-shadow:var(--shadow);border:1px solid var(--border)}
-    table{border-collapse:collapse;min-width:100%;background:var(--surface);font-size:.8rem}
-    thead tr th{background:var(--header-bg);color:var(--header-text);padding:.45rem .5rem;text-align:center;font-family:'Courier New',monospace;font-weight:normal;letter-spacing:.04em;border-right:1px solid rgba(255,255,255,.15);white-space:nowrap;min-width:36px}
-    thead tr th:first-child{text-align:left;min-width:160px;padding-left:.8rem}
-    tbody tr td{padding:.35rem .45rem;text-align:center;border-right:1px solid var(--border);border-bottom:1px solid var(--border);white-space:nowrap}
-    tbody tr td:first-child{text-align:left;font-family:'Courier New',monospace;font-size:.78rem;padding-left:.8rem;font-weight:bold;background:#f0efe9;position:sticky;left:0;z-index:1;border-right:2px solid var(--border)}
-    tbody tr:nth-child(even){background:var(--row-alt)}
-    tbody tr:hover td{background:var(--accent-light)}
-    tbody tr:hover td:first-child{background:var(--accent-mid)}
+    /* CALENDAR TABLE */
+    .table-wrapper{overflow-x:auto;border-radius:6px;box-shadow:var(--shadow);border:1px solid var(--border);margin-bottom:1.5rem}
+    table{border-collapse:collapse;min-width:100%;background:#fff;font-size:.78rem}
+    thead th{background:var(--hbg);color:#fff;padding:.42rem .45rem;text-align:center;font-family:'Courier New',monospace;font-weight:normal;border-right:1px solid rgba(255,255,255,.15);white-space:nowrap;min-width:34px}
+    thead th:first-child{text-align:left;min-width:150px;padding-left:.8rem}
+    tbody td{padding:.32rem .4rem;text-align:center;border-right:1px solid var(--border);border-bottom:1px solid var(--border);white-space:nowrap;min-width:34px}
+    tbody td:first-child{text-align:left;font-family:'Courier New',monospace;font-size:.76rem;padding-left:.7rem;font-weight:bold;background:#f0efe9;position:sticky;left:0;z-index:1;border-right:2px solid var(--border);min-width:150px}
+    tbody tr:nth-child(even) td:not(.cell-F):not(.cell-N){background:var(--row-alt)}
+    tbody tr:nth-child(even) td:first-child{background:#ebe9e2}
 
-    /* editable cells */
-    td[contenteditable="true"]{outline:none;cursor:text}
-    td[contenteditable="true"]:focus{background:#fffbe6!important;outline:2px solid #f0c040;outline-offset:-2px}
-    th[contenteditable="true"]{outline:none;cursor:text}
-    th[contenteditable="true"]:focus{background:#1045a0!important;outline:2px solid #f0c040;outline-offset:-2px}
+    /* TURN COLORS */
+    .cell-F{background:#444!important;color:#fff!important;font-weight:bold}
+    .cell-N{background:#ccc!important;color:#222!important;font-weight:bold}
+    .cell-M{font-weight:bold}
+    .cell-T{font-weight:bold}
+    .cell-RM{font-weight:bold}
+    .cell-RT{font-weight:bold}
+    .cell-dash{}
 
-    .day-header{display:flex;flex-direction:column;align-items:center;line-height:1.3}
-    .day-num{font-size:.82rem;font-weight:bold}
-    .day-letter{font-size:.67rem;opacity:.78}
+    /* EDITABLE */
+    [contenteditable="true"]{outline:none;cursor:text}
+    [contenteditable="true"]:focus{outline:2px solid #f0c040!important;outline-offset:-2px;background:#fffbe6!important}
+    thead th[contenteditable="true"]:focus{background:#1045a0!important}
 
-    .loading,.error{padding:3rem 2rem;text-align:center;font-family:'Courier New',monospace;font-size:.88rem;color:var(--muted)}
-    .error{color:#a32d2d}
-    .spinner{display:inline-block;width:16px;height:16px;border:2px solid var(--accent-mid);border-top-color:var(--accent);border-radius:50%;animation:spin .7s linear infinite;vertical-align:middle;margin-right:8px}
+    .day-header{display:flex;flex-direction:column;align-items:center;line-height:1.25}
+    .day-num{font-size:.8rem;font-weight:bold}
+    .day-letter{font-size:.64rem;opacity:.8}
+
+    .loading,.msg-error{padding:2.5rem 2rem;text-align:center;font-family:'Courier New',monospace;font-size:.85rem;color:var(--muted)}
+    .msg-error{color:var(--red)}
+    .spinner{display:inline-block;width:15px;height:15px;border:2px solid var(--accent-mid);border-top-color:var(--accent);border-radius:50%;animation:spin .7s linear infinite;vertical-align:middle;margin-right:7px}
     @keyframes spin{to{transform:rotate(360deg)}}
 
-    .add-row-row td{background:#f5f4ef;text-align:center!important;padding:.2rem}
-    .btn-add-row{background:none;border:1px dashed #bbb;border-radius:3px;color:var(--muted);font-size:.75rem;font-family:'Courier New',monospace;padding:.2rem .7rem;cursor:pointer;width:100%}
+    .add-row-row td{background:#f5f4ef!important;text-align:center!important;padding:.18rem}
+    .btn-add-row{background:none;border:1px dashed #bbb;border-radius:3px;color:var(--muted);font-size:.72rem;font-family:'Courier New',monospace;padding:.18rem .6rem;cursor:pointer;width:100%}
     .btn-add-row:hover{background:var(--accent-light);color:var(--accent);border-color:var(--accent)}
 
-    @media(max-width:600px){
-      header{padding:.8rem}
-      .tabs-bar{padding:0 .8rem}
+    /* CONFIG PANEL */
+    .config-panel{background:#fff;border:1px solid var(--border);border-radius:6px;padding:1rem 1.2rem;margin-bottom:1.5rem}
+    .config-panel h3{font-family:'Courier New',monospace;font-size:.82rem;color:var(--accent);letter-spacing:.06em;text-transform:uppercase;margin-bottom:.8rem;border-bottom:1px solid var(--border);padding-bottom:.4rem}
+    .config-table{width:100%;border-collapse:collapse;font-size:.76rem}
+    .config-table th{background:#f0efe9;padding:.35rem .5rem;text-align:left;font-family:'Courier New',monospace;font-weight:normal;font-size:.7rem;color:var(--muted);border:1px solid var(--border);white-space:nowrap}
+    .config-table td{padding:.3rem .45rem;border:1px solid var(--border);vertical-align:middle}
+    .config-table td:first-child{font-weight:bold;font-family:'Courier New',monospace;background:#f9f8f5;min-width:130px}
+    .config-table input[type=number]{width:50px;padding:.2rem .3rem;border:1px solid var(--border);border-radius:3px;font-family:'Courier New',monospace;font-size:.75rem;text-align:center}
+    .config-table input[type=text]{width:120px;padding:.2rem .35rem;border:1px solid var(--border);border-radius:3px;font-family:'Courier New',monospace;font-size:.73rem}
+    .chk-wrap{display:flex;align-items:center;justify-content:center;gap:.25rem;cursor:pointer}
+    .chk-wrap input{cursor:pointer;width:14px;height:14px}
+    .chk-label{font-family:'Courier New',monospace;font-size:.7rem;color:var(--muted)}
+
+    /* LEGEND */
+    .legend{display:flex;flex-wrap:wrap;gap:.4rem;margin-bottom:1rem;font-family:'Courier New',monospace;font-size:.7rem}
+    .leg-item{display:inline-flex;align-items:center;gap:.25rem;padding:.15rem .45rem;border-radius:3px;border:1px solid #ddd}
+    .leg-F{background:#444;color:#fff}
+    .leg-N{background:#ccc;color:#222}
+    .leg-M{}
+    .leg-T{}
+    .leg-RM{}
+    .leg-RT{}
+    .leg-dash{}
+
+    /* COVER CONFIG */
+    .cover-req{background:#fff8e6;border:1px solid #e0c060;border-radius:6px;padding:.7rem 1rem;margin-bottom:1rem;font-family:'Courier New',monospace;font-size:.76rem;color:#6b4a00;display:flex;flex-wrap:wrap;align-items:center;gap:.6rem}
+    .cover-req label{color:var(--muted)}
+    .cover-req input[type=number]{width:44px;padding:.2rem .3rem;border:1px solid var(--border);border-radius:3px;font-family:'Courier New',monospace;font-size:.75rem;text-align:center}
+
+    @media(max-width:640px){
       .tab-content{padding:.8rem .4rem 2rem}
-      .tab-btn{padding:.6rem .7rem;font-size:.7rem}
-      .toolbar{gap:.4rem}
+      .toolbar{gap:.35rem}
+      .config-table{font-size:.7rem}
     }
   </style>
 </head>
@@ -105,209 +136,496 @@
 const API = "https://script.google.com/macros/s/AKfycbzP-qBzVytXwMXTU67z8i4MFUYENUvtVOgoBicXOv-b1-zGi4QgvoKj9gdu_jHJZEhg/exec";
 const MESES = ["ENERO","FEBRERO","MARZO","ABRIL","MAYO","JUNIO","JULIO","AGOSTO","SEPTIEMBRE","OCTUBRE","NOVIEMBRE","DICIEMBRE"];
 const DIAS  = ["D","L","MA","MI","J","V","S"];
+const VALID_VALS = ["M","T","N","F","RM","RT","-",""];
 
-let state = { current: null, next: null };
+// State
+const state   = { current: null, next: null };   // calendar data [rows][cols]
+const config  = { current: [],   next: []   };   // worker config
+const loaded  = {};
 let cbN = 0;
 
-/* ── JSONP helper ── */
+/* ────────────────────────────────────────────
+   JSONP
+──────────────────────────────────────────── */
 function jsonp(params, cb) {
-  const name = "__cb" + (++cbN);
+  const name = "__cb"+(++cbN);
   const qs   = Object.entries(params).map(([k,v])=>k+"="+encodeURIComponent(v)).join("&");
-  const to   = setTimeout(()=>{ cb({error:"Timeout"}); delete window[name]; }, 20000);
-  window[name] = d => { clearTimeout(to); delete window[name]; cb(d); };
-  const s = document.createElement("script");
-  s.src = API + "?" + qs + "&callback=" + name;
-  s.onerror = () => { clearTimeout(to); cb({error:"Error de red"}); delete window[name]; };
+  const to   = setTimeout(()=>{cb({error:"Timeout"});delete window[name];},25000);
+  window[name] = d=>{clearTimeout(to);delete window[name];cb(d);};
+  const s=document.createElement("script");
+  s.src=API+"?"+qs+"&callback="+name;
+  s.onerror=()=>{clearTimeout(to);cb({error:"Error de red"});delete window[name];};
   document.head.appendChild(s);
 }
 
-/* ── tabs ── */
-const loaded = {};
-function switchTab(tab, btn) {
+/* ────────────────────────────────────────────
+   TABS
+──────────────────────────────────────────── */
+function switchTab(tab,btn){
   document.querySelectorAll(".tab-btn").forEach(b=>b.classList.remove("active"));
   document.querySelectorAll(".tab-content").forEach(c=>c.classList.remove("active"));
   btn.classList.add("active");
   document.getElementById("tab-"+tab).classList.add("active");
-  if (!loaded[tab]) loadTab(tab);
+  if(!loaded[tab]) loadTab(tab);
 }
 
-function loadTab(tab) {
-  loaded[tab] = true;
-  setHtml(tab, '<div class="loading"><span class="spinner"></span>Cargando...</div>');
-  jsonp({action:"read", tab}, json => {
-    if (json.error) { setHtml(tab, '<div class="error">'+esc(json.error)+'</div>'); return; }
-    state[tab] = json.data;
-    render(tab);
+function loadTab(tab){
+  loaded[tab]=true;
+  setHtml(tab,'<div class="loading"><span class="spinner"></span>Cargando...</div>');
+  // Load calendar + config in parallel
+  let calDone=false, cfgDone=false;
+  jsonp({action:"read",tab},json=>{
+    if(!json.error) state[tab]=json.data;
+    calDone=true; if(cfgDone) render(tab);
+  });
+  jsonp({action:"readConfig",tab},json=>{
+    if(!json.error && json.config) config[tab]=json.config;
+    cfgDone=true; if(calDone) render(tab);
   });
 }
 
-function setHtml(tab, html) {
+function setHtml(tab,html){document.getElementById("tab-"+tab).innerHTML=html;}
+
+/* ────────────────────────────────────────────
+   RENDER
+──────────────────────────────────────────── */
+function render(tab){
+  const now=new Date();
+  const defM = tab==="next"?(now.getMonth()+1)%12:now.getMonth();
+  const defY = tab==="next"&&now.getMonth()===11?now.getFullYear()+1:now.getFullYear();
+
+  let html=`
+  <div class="toolbar">
+    <label>Mes:</label>
+    <select id="sel-m-${tab}">${MESES.map((m,i)=>`<option value="${i}"${i===defM?" selected":""}>${m}</option>`).join("")}</select>
+    <label>Año:</label>
+    <input type="number" id="sel-y-${tab}" value="${defY}" min="2020" max="2099" style="width:68px">
+    <button class="btn btn-blue"   onclick="doInitMonth('${tab}')">⚙ Generar mes</button>
+    <button class="btn btn-purple" onclick="doAutoFill('${tab}')">🔀 Distribuir turnos</button>
+    <button class="btn btn-green"  onclick="doSave('${tab}')">💾 Guardar cambios</button>
+    <span id="status-${tab}"></span>
+  </div>
+
+  <div class="cover-req">
+    <strong>Cobertura por turno/día:</strong>
+    <label>M: <input type="number" id="cov-M-${tab}" value="3" min="1" max="20" title="Trabajadores turno Mañana"></label>
+    <label>T: <input type="number" id="cov-T-${tab}" value="3" min="1" max="20" title="Trabajadores turno Tarde"></label>
+    <label>N: <input type="number" id="cov-N-${tab}" value="4" min="1" max="20" title="Trabajadores turno Noche"></label>
+    <label>RM: <input type="number" id="cov-RM-${tab}" value="1" min="0" max="10" title="Refuerzos Mañana"></label>
+    <label>RT: <input type="number" id="cov-RT-${tab}" value="1" min="0" max="10" title="Refuerzos Tarde"></label>
+  </div>`;
+
+  html += buildLegend();
+  html += buildTable(tab, state[tab]);
+  html += buildConfigPanel(tab);
   document.getElementById("tab-"+tab).innerHTML = html;
 }
 
-/* ── render ── */
-function render(tab) {
-  const container = document.getElementById("tab-"+tab);
-  const now = new Date();
-  const defYear  = now.getFullYear();
-  const defMonth = tab === "next" ? (now.getMonth()+1) % 12 : now.getMonth();
-  const defYearNext = tab === "next" && now.getMonth()===11 ? defYear+1 : defYear;
-
-  let html = `<div class="toolbar">
-    <label>Mes:</label>
-    <select id="sel-month-${tab}">
-      ${MESES.map((m,i)=>`<option value="${i}" ${i===(tab==="next"?defMonth:defMonth)?"selected":""}>${m}</option>`).join("")}
-    </select>
-    <label>Año:</label>
-    <input type="number" id="sel-year-${tab}" value="${tab==="next"?defYearNext:defYear}" min="2020" max="2099" style="width:70px">
-    <button class="btn btn-init" onclick="initMonth('${tab}')">⚙ Generar mes</button>
-    <button class="btn btn-save" onclick="saveTab('${tab}')">💾 Guardar cambios</button>
-    <span id="status-${tab}"></span>
+function buildLegend(){
+  return `<div class="legend">
+    <span class="leg-item leg-M">M — Mañana</span>
+    <span class="leg-item leg-T">T — Tarde</span>
+    <span class="leg-item leg-N">N — Noche</span>
+    <span class="leg-item leg-F">F — Franco</span>
+    <span class="leg-item leg-RM">RM — Ref. Mañana</span>
+    <span class="leg-item leg-RT">RT — Ref. Tarde</span>
+    <span class="leg-item leg-dash">— — No disponible</span>
   </div>`;
-
-  html += buildTable(tab, state[tab]);
-  container.innerHTML = html;
 }
 
-function buildTable(tab, rows) {
-  if (!rows || rows.length === 0) return '<div class="error">Sin datos. Usá "Generar mes" para inicializar.</div>';
+function buildTable(tab, rows){
+  if(!rows||rows.length===0) return '<div class="msg-error">Sin datos. Usá "Generar mes" para inicializar.</div>';
+  const header=rows[0];
+  const monthYear=String(header[0]||"").trim();
+  let numDays=0;
+  for(let c=1;c<header.length;c++){if(String(header[c]||"").trim()==="")break;numDays++;}
 
-  const header = rows[0];
-  const monthYear = String(header[0]||"").trim();
-
-  // Detectar columnas de días
-  let numDays = 0;
-  for (let c = 1; c < header.length; c++) {
-    if (String(header[c]||"").trim() === "") break;
-    numDays++;
+  let t=`<div class="table-wrapper"><table><thead><tr>`;
+  t+=`<th contenteditable="true" data-tab="${tab}" data-r="0" data-c="0" onblur="cellEdit(this)">${esc(monthYear)}</th>`;
+  for(let c=1;c<=numDays;c++){
+    const raw=String(header[c]||"").trim();
+    const parts=raw.split(/\n|\r/);
+    const num=parts[0]||""; const letter=parts[1]||"";
+    t+=`<th contenteditable="true" data-tab="${tab}" data-r="0" data-c="${c}" onblur="cellEdit(this)">
+      <div class="day-header"><span class="day-num">${esc(num)}</span>${letter?`<span class="day-letter">${esc(letter)}</span>`:""}</div></th>`;
   }
+  t+=`</tr></thead><tbody>`;
 
-  let t = `<div class="table-wrapper"><table>`;
-
-  // THEAD — mes/año editable, días editables
-  t += `<thead><tr>`;
-  t += `<th contenteditable="true" data-tab="${tab}" data-r="0" data-c="0" onblur="cellEdit(this)">${esc(monthYear)}</th>`;
-  for (let c = 1; c <= numDays; c++) {
-    const raw = String(header[c]||"").trim();
-    const parts = raw.split(/\n|\r/);
-    const num = parts[0]||"";
-    const letter = parts[1]||"";
-    t += `<th contenteditable="true" data-tab="${tab}" data-r="0" data-c="${c}" onblur="cellEdit(this)">
-      <div class="day-header">
-        <span class="day-num">${esc(num)}</span>
-        ${letter ? `<span class="day-letter">${esc(letter)}</span>` : ""}
-      </div>
-    </th>`;
-  }
-  t += `</tr></thead><tbody>`;
-
-  // TBODY — empleados
-  for (let r = 1; r < rows.length; r++) {
-    const name = String(rows[r][0]||"").trim();
-    if (name === "" && rows[r].slice(1).every(v=>String(v).trim()==="")) continue;
-    t += `<tr>`;
-    t += `<td contenteditable="true" data-tab="${tab}" data-r="${r}" data-c="0" onblur="cellEdit(this)">${esc(name)}</td>`;
-    for (let c = 1; c <= numDays; c++) {
-      const val = String(rows[r][c]!==undefined ? rows[r][c] : "").trim();
-      t += `<td contenteditable="true" data-tab="${tab}" data-r="${r}" data-c="${c}" onblur="cellEdit(this)">${esc(val)}</td>`;
+  for(let r=1;r<rows.length;r++){
+    const name=String(rows[r][0]||"").trim();
+    if(name===""&&rows[r].slice(1).every(v=>String(v).trim()==="")) continue;
+    t+=`<tr>`;
+    t+=`<td contenteditable="true" data-tab="${tab}" data-r="${r}" data-c="0" onblur="cellEdit(this)">${esc(name)}</td>`;
+    for(let c=1;c<=numDays;c++){
+      const val=String(rows[r][c]!==undefined?rows[r][c]:"").trim().toUpperCase();
+      const cls=cellClass(val);
+      t+=`<td contenteditable="true" class="${cls}" data-tab="${tab}" data-r="${r}" data-c="${c}" onblur="cellEditTurn(this)">${esc(val)}</td>`;
     }
-    t += `</tr>`;
+    t+=`</tr>`;
   }
 
-  // Fila para agregar empleado
-  t += `<tr class="add-row-row"><td colspan="${numDays+1}">
+  t+=`<tr class="add-row-row"><td colspan="${numDays+1}">
     <button class="btn-add-row" onclick="addEmployee('${tab}')">+ Agregar empleado</button>
   </td></tr>`;
-
-  t += `</tbody></table></div>`;
+  t+=`</tbody></table></div>`;
   return t;
 }
 
-/* ── edición inline ── */
-function cellEdit(el) {
-  const tab = el.dataset.tab;
-  const r   = parseInt(el.dataset.r);
-  const c   = parseInt(el.dataset.c);
-  // Extraer texto plano del contenteditable (puede tener spans dentro)
-  let val = el.innerText.trim();
-  if (!state[tab]) return;
-  while (state[tab].length <= r) state[tab].push([]);
-  while (state[tab][r].length <= c) state[tab][r].push("");
-  state[tab][r][c] = val;
+function cellClass(val){
+  if(val==="F")  return "cell-F";
+  if(val==="N")  return "cell-N";
+  if(val==="M")  return "cell-M";
+  if(val==="T")  return "cell-T";
+  if(val==="RM") return "cell-RM";
+  if(val==="RT") return "cell-RT";
+  if(val==="-")  return "cell-dash";
+  return "";
 }
 
-function addEmployee(tab) {
-  if (!state[tab] || state[tab].length === 0) return;
-  const numCols = state[tab][0].length;
-  const newRow = new Array(numCols).fill("");
-  newRow[0] = "Nuevo empleado";
+/* ────────────────────────────────────────────
+   CONFIG PANEL
+──────────────────────────────────────────── */
+function buildConfigPanel(tab){
+  // Get employee names from calendar state
+  const names = getEmployeeNames(tab);
+
+  // Merge with existing config
+  const cfgMap={};
+  (config[tab]||[]).forEach(c=>{cfgMap[c.name]=c;});
+
+  let html=`<div class="config-panel">
+  <h3>⚙ Configuración de empleados</h3>
+  <div style="overflow-x:auto">
+  <table class="config-table">
+    <thead><tr>
+      <th>Empleado</th>
+      <th>Francos/mes</th>
+      <th>Puede N</th>
+      <th>Puede RM</th>
+      <th>Puede RT</th>
+      <th>Días no disponibles <span style="font-size:.65rem;opacity:.7">(ej: 5,12,20)</span></th>
+      <th>Turnos preferidos <span style="font-size:.65rem;opacity:.7">(M/T/N)</span></th>
+    </tr></thead><tbody>`;
+
+  names.forEach(name=>{
+    const c=cfgMap[name]||{name,francos:9,canN:false,canRM:false,canRT:false,unavailable:"",preferred:""};
+    html+=`<tr>
+      <td>${esc(name)}</td>
+      <td><input type="number" class="cfg-francos" data-name="${esc(name)}" data-tab="${tab}" value="${c.francos}" min="0" max="31"></td>
+      <td><label class="chk-wrap"><input type="checkbox" class="cfg-canN"  data-name="${esc(name)}" data-tab="${tab}" ${c.canN?"checked":""}><span class="chk-label">N</span></label></td>
+      <td><label class="chk-wrap"><input type="checkbox" class="cfg-canRM" data-name="${esc(name)}" data-tab="${tab}" ${c.canRM?"checked":""}><span class="chk-label">RM</span></label></td>
+      <td><label class="chk-wrap"><input type="checkbox" class="cfg-canRT" data-name="${esc(name)}" data-tab="${tab}" ${c.canRT?"checked":""}><span class="chk-label">RT</span></label></td>
+      <td><input type="text" class="cfg-unavail" data-name="${esc(name)}" data-tab="${tab}" value="${esc(c.unavailable)}" placeholder="5,12,20..."></td>
+      <td><input type="text" class="cfg-pref"    data-name="${esc(name)}" data-tab="${tab}" value="${esc(c.preferred)}"  placeholder="M,T..."></td>
+    </tr>`;
+  });
+
+  html+=`</tbody></table></div>
+  <div style="margin-top:.6rem;display:flex;gap:.5rem;align-items:center">
+    <button class="btn btn-green" onclick="saveConfig('${tab}')">💾 Guardar configuración</button>
+    <span id="cfg-status-${tab}"></span>
+  </div>
+  </div>`;
+  return html;
+}
+
+function getEmployeeNames(tab){
+  const names=[];
+  if(!state[tab]) return names;
+  for(let r=1;r<state[tab].length;r++){
+    const n=String(state[tab][r][0]||"").trim();
+    if(n) names.push(n);
+  }
+  return names;
+}
+
+/* ────────────────────────────────────────────
+   CELL EDIT
+──────────────────────────────────────────── */
+function cellEdit(el){
+  const tab=el.dataset.tab, r=parseInt(el.dataset.r), c=parseInt(el.dataset.c);
+  let val=el.innerText.trim();
+  ensureCell(tab,r,c);
+  state[tab][r][c]=val;
+}
+
+function cellEditTurn(el){
+  const tab=el.dataset.tab, r=parseInt(el.dataset.r), c=parseInt(el.dataset.c);
+  let val=el.innerText.trim().toUpperCase();
+  // Normalize
+  if(!VALID_VALS.includes(val)) val=val; // keep as typed, user may know what they do
+  ensureCell(tab,r,c);
+  state[tab][r][c]=val;
+  // Update cell class
+  el.className=cellClass(val);
+}
+
+function ensureCell(tab,r,c){
+  if(!state[tab]) state[tab]=[];
+  while(state[tab].length<=r) state[tab].push([]);
+  while(state[tab][r].length<=c) state[tab][r].push("");
+}
+
+function addEmployee(tab){
+  if(!state[tab]||state[tab].length===0) return;
+  const numCols=state[tab][0].length;
+  const newRow=new Array(numCols).fill("");
+  newRow[0]="Nuevo empleado";
   state[tab].push(newRow);
   render(tab);
-  // Scroll al final de la tabla y focus en el nombre
-  const tds = document.querySelectorAll(`#tab-${tab} tbody tr:not(.add-row-row):last-child td`);
-  if (tds[0]) { tds[0].focus(); selectAll(tds[0]); }
+  const tds=document.querySelectorAll(`#tab-${tab} tbody tr:not(.add-row-row):last-child td`);
+  if(tds[0]){tds[0].focus();selectAll(tds[0]);}
 }
 
-function selectAll(el) {
-  const range = document.createRange();
-  range.selectNodeContents(el);
-  const sel = window.getSelection();
-  sel.removeAllRanges();
-  sel.addRange(range);
-}
-
-/* ── generar mes ── */
-function initMonth(tab) {
-  const month = parseInt(document.getElementById("sel-month-"+tab).value);
-  const year  = parseInt(document.getElementById("sel-year-"+tab).value);
-  setStatus(tab, "⏳ Generando...", "");
-  jsonp({ action:"initMonth", tab, month, year }, json => {
-    if (json.error) { setStatus(tab, "✗ "+json.error, "badge-err"); return; }
-    state[tab] = json.data;
+/* ────────────────────────────────────────────
+   INIT MONTH
+──────────────────────────────────────────── */
+function doInitMonth(tab){
+  const month=parseInt(document.getElementById("sel-m-"+tab).value);
+  const year =parseInt(document.getElementById("sel-y-"+tab).value);
+  setStatus(tab,"⏳ Generando...","");
+  jsonp({action:"initMonth",tab,month,year},json=>{
+    if(json.error){setStatus(tab,"✗ "+json.error,"badge-err");return;}
+    state[tab]=json.data;
     render(tab);
-    setStatus(tab, "✓ Mes generado", "badge-ok");
+    setStatus(tab,"✓ Mes generado","badge-ok");
   });
 }
 
-/* ── guardar ── */
-function saveTab(tab) {
-  if (!state[tab]) return;
-  setStatus(tab, "⏳ Guardando...", "");
-
-  // Leer estado actual de la tabla (por si el usuario editó sin disparar blur)
+/* ────────────────────────────────────────────
+   AUTO FILL — DISTRIBUTE SHIFTS
+──────────────────────────────────────────── */
+function doAutoFill(tab){
   syncTableToState(tab);
+  if(!state[tab]||state[tab].length<2){setStatus(tab,"Sin datos","badge-err");return;}
 
-  const payload = encodeURIComponent(JSON.stringify(state[tab]));
-  jsonp({ action:"save", tab, payload }, json => {
-    if (json.error) { setStatus(tab, "✗ "+json.error, "badge-err"); return; }
-    setStatus(tab, "✓ Guardado en Sheets", "badge-ok");
+  const covM  = parseInt(document.getElementById("cov-M-"+tab).value)||3;
+  const covT  = parseInt(document.getElementById("cov-T-"+tab).value)||3;
+  const covN  = parseInt(document.getElementById("cov-N-"+tab).value)||4;
+  const covRM = parseInt(document.getElementById("cov-RM-"+tab).value)||1;
+  const covRT = parseInt(document.getElementById("cov-RT-"+tab).value)||1;
+
+  // Build config map
+  const cfgMap={};
+  readConfigFromDOM(tab).forEach(c=>{cfgMap[c.name]=c;});
+
+  const header=state[tab][0];
+  let numDays=0;
+  for(let c=1;c<header.length;c++){if(String(header[c]||"").trim()==="")break;numDays++;}
+
+  // Get day letters (0=Sun..6=Sat) from header
+  const dayDOW=[]; // index 0 = day 1
+  for(let c=1;c<=numDays;c++){
+    const raw=String(header[c]||"").trim();
+    const letter=(raw.split(/\n|\r/)[1]||"").trim();
+    // Convert letter back to DOW index (not strictly needed for logic but good to have)
+    dayDOW.push(letter);
+  }
+
+  // Employee rows: indices 1..n
+  const empRows=[];
+  for(let r=1;r<state[tab].length;r++){
+    const name=String(state[tab][r][0]||"").trim();
+    if(!name) continue;
+    empRows.push({r, name});
+  }
+
+  // Work on a copy of shifts
+  const shifts=[]; // shifts[empIdx][dayIdx 0-based] = value
+  empRows.forEach(({r})=>{
+    const row=[];
+    for(let c=1;c<=numDays;c++) row.push(String(state[tab][r][c]||"").trim().toUpperCase());
+    shifts.push(row);
+  });
+
+  // Mark locked cells (already filled by user)
+  const locked=shifts.map(row=>row.map(v=>v!=="")); // true = don't touch
+
+  // Mark unavailable from config
+  empRows.forEach((emp,ei)=>{
+    const cfg=cfgMap[emp.name];
+    if(!cfg) return;
+    const days=(cfg.unavailable||"").split(",").map(s=>parseInt(s.trim())-1).filter(d=>!isNaN(d)&&d>=0&&d<numDays);
+    days.forEach(d=>{if(!locked[ei][d]){shifts[ei][d]="-";locked[ei][d]=true;}});
+  });
+
+  // Count francos needed per employee
+  const francoTarget=empRows.map(emp=>{
+    const cfg=cfgMap[emp.name];
+    return cfg?parseInt(cfg.francos)||9:9;
+  });
+
+  // Count already assigned francos
+  const francosUsed=shifts.map(row=>row.filter(v=>v==="F").length);
+
+  // Shift types to fill (in priority order)
+  const shiftTypes=["N","M","T","RM","RT","F"];
+
+  // For each day, figure out what still needs coverage
+  for(let d=0;d<numDays;d++){
+    // Count current coverage for this day
+    const dayCounts={M:0,T:0,N:0,RM:0,RT:0,F:0};
+    shifts.forEach(row=>{if(dayCounts[row[d]]!==undefined) dayCounts[row[d]]++;});
+
+    const needed={
+      M: Math.max(0,covM-dayCounts.M),
+      T: Math.max(0,covT-dayCounts.T),
+      N: Math.max(0,covN-dayCounts.N),
+      RM:Math.max(0,covRM-dayCounts.RM),
+      RT:Math.max(0,covRT-dayCounts.RT)
+    };
+
+    // Available employees for this day (not locked)
+    const available=empRows.map((_,ei)=>ei).filter(ei=>!locked[ei][d]);
+
+    // Shuffle available to distribute fairly
+    available.sort(()=>Math.random()-.5);
+
+    // Assign N first (restricted pool)
+    if(needed.N>0){
+      const pool=available.filter(ei=>{
+        const cfg=cfgMap[empRows[ei].name];
+        return cfg&&cfg.canN;
+      });
+      pool.slice(0,needed.N).forEach(ei=>{shifts[ei][d]="N";locked[ei][d]=true;});
+    }
+
+    // Assign RM (restricted pool)
+    if(needed.RM>0){
+      const pool=available.filter(ei=>!locked[ei][d]&&(cfgMap[empRows[ei].name]||{}).canRM);
+      pool.slice(0,needed.RM).forEach(ei=>{shifts[ei][d]="RM";locked[ei][d]=true;});
+    }
+
+    // Assign RT (restricted pool)
+    if(needed.RT>0){
+      const pool=available.filter(ei=>!locked[ei][d]&&(cfgMap[empRows[ei].name]||{}).canRT);
+      pool.slice(0,needed.RT).forEach(ei=>{shifts[ei][d]="RT";locked[ei][d]=true;});
+    }
+
+    // Assign M — prefer workers who prefer M
+    if(needed.M>0){
+      const pool=available.filter(ei=>!locked[ei][d]);
+      pool.sort((a,b)=>{
+        const pa=(cfgMap[empRows[a].name]||{}).preferred||"";
+        const pb=(cfgMap[empRows[b].name]||{}).preferred||"";
+        return (pb.includes("M")?1:0)-(pa.includes("M")?1:0);
+      });
+      pool.slice(0,needed.M).forEach(ei=>{shifts[ei][d]="M";locked[ei][d]=true;});
+    }
+
+    // Assign T — prefer workers who prefer T
+    if(needed.T>0){
+      const pool=available.filter(ei=>!locked[ei][d]);
+      pool.sort((a,b)=>{
+        const pa=(cfgMap[empRows[a].name]||{}).preferred||"";
+        const pb=(cfgMap[empRows[b].name]||{}).preferred||"";
+        return (pb.includes("T")?1:0)-(pa.includes("T")?1:0);
+      });
+      pool.slice(0,needed.T).forEach(ei=>{shifts[ei][d]="T";locked[ei][d]=true;});
+    }
+  }
+
+  // Assign francos to remaining empty cells
+  // Sort days with most coverage first to assign francos on heavy days
+  for(let ei=0;ei<empRows.length;ei++){
+    let remaining=Math.max(0,francoTarget[ei]-francosUsed[ei]-shifts[ei].filter(v=>v==="F").length);
+    // Find unlocked empty cells
+    const emptyCells=[];
+    for(let d=0;d<numDays;d++){if(!locked[ei][d]&&shifts[ei][d]==="") emptyCells.push(d);}
+    // Distribute francos evenly through the month
+    const step=Math.max(1,Math.floor(emptyCells.length/(remaining||1)));
+    let assigned=0;
+    for(let i=0;i<emptyCells.length&&assigned<remaining;i+=step){
+      shifts[ei][emptyCells[i]]="F";
+      locked[ei][emptyCells[i]]=true;
+      assigned++;
+    }
+  }
+
+  // Write back to state
+  empRows.forEach(({r},ei)=>{
+    for(let c=1;c<=numDays;c++) state[tab][r][c]=shifts[ei][c-1];
+  });
+
+  render(tab);
+  setStatus(tab,"✓ Turnos distribuidos","badge-ok");
+}
+
+/* ────────────────────────────────────────────
+   SAVE CALENDAR
+──────────────────────────────────────────── */
+function doSave(tab){
+  syncTableToState(tab);
+  if(!state[tab]){setStatus(tab,"Sin datos","badge-err");return;}
+  setStatus(tab,"⏳ Guardando...","");
+  const payload=encodeURIComponent(JSON.stringify(state[tab]));
+  jsonp({action:"save",tab,payload},json=>{
+    if(json.error){setStatus(tab,"✗ "+json.error,"badge-err");return;}
+    setStatus(tab,"✓ Guardado en Sheets","badge-ok");
   });
 }
 
-function syncTableToState(tab) {
-  document.querySelectorAll(`#tab-${tab} [data-tab="${tab}"]`).forEach(el => {
-    const r = parseInt(el.dataset.r);
-    const c = parseInt(el.dataset.c);
-    if (!state[tab]) return;
-    while (state[tab].length <= r) state[tab].push([]);
-    while (state[tab][r].length <= c) state[tab][r].push("");
-    state[tab][r][c] = el.innerText.trim();
+/* ────────────────────────────────────────────
+   SAVE CONFIG
+──────────────────────────────────────────── */
+function readConfigFromDOM(tab){
+  const result=[];
+  const names=getEmployeeNames(tab);
+  names.forEach(name=>{
+    const francos=parseInt(document.querySelector(`.cfg-francos[data-name="${name}"][data-tab="${tab}"]`)?.value)||9;
+    const canN   =document.querySelector(`.cfg-canN[data-name="${name}"][data-tab="${tab}"]`)?.checked||false;
+    const canRM  =document.querySelector(`.cfg-canRM[data-name="${name}"][data-tab="${tab}"]`)?.checked||false;
+    const canRT  =document.querySelector(`.cfg-canRT[data-name="${name}"][data-tab="${tab}"]`)?.checked||false;
+    const unavail=document.querySelector(`.cfg-unavail[data-name="${name}"][data-tab="${tab}"]`)?.value||"";
+    const pref   =document.querySelector(`.cfg-pref[data-name="${name}"][data-tab="${tab}"]`)?.value||"";
+    result.push({name,francos,canN,canRM,canRT,unavailable:unavail,preferred:pref});
+  });
+  return result;
+}
+
+function saveConfig(tab){
+  const cfg=readConfigFromDOM(tab);
+  config[tab]=cfg;
+  const s=document.getElementById("cfg-status-"+tab);
+  if(s) s.innerHTML='<span class="badge">⏳ Guardando...</span>';
+  const payload=encodeURIComponent(JSON.stringify(cfg));
+  jsonp({action:"saveConfig",tab,payload},json=>{
+    if(!s) return;
+    if(json.error) s.innerHTML=`<span class="badge badge-err">✗ ${esc(json.error)}</span>`;
+    else           s.innerHTML='<span class="badge badge-ok">✓ Guardado</span>';
   });
 }
 
-function setStatus(tab, msg, cls) {
-  const el = document.getElementById("status-"+tab);
-  if (!el) return;
-  el.innerHTML = `<span class="badge ${cls}">${msg}</span>`;
+/* ────────────────────────────────────────────
+   HELPERS
+──────────────────────────────────────────── */
+function syncTableToState(tab){
+  document.querySelectorAll(`#tab-${tab} [data-tab="${tab}"][data-r]`).forEach(el=>{
+    const r=parseInt(el.dataset.r), c=parseInt(el.dataset.c);
+    ensureCell(tab,r,c);
+    let val=el.innerText.trim();
+    if(c>0&&r>0) val=val.toUpperCase();
+    state[tab][r][c]=val;
+  });
 }
 
-function esc(s) {
+function setStatus(tab,msg,cls){
+  const el=document.getElementById("status-"+tab);
+  if(el) el.innerHTML=`<span class="badge ${cls}">${msg}</span>`;
+}
+
+function selectAll(el){
+  const range=document.createRange();range.selectNodeContents(el);
+  const sel=window.getSelection();sel.removeAllRanges();sel.addRange(range);
+}
+
+function esc(s){
   return String(s)
     .replace(/&/g,"&amp;").replace(/</g,"&lt;")
     .replace(/>/g,"&gt;").replace(/"/g,"&quot;");
 }
 
-/* ── init ── */
+/* ── INIT ── */
 loadTab("current");
 </script>
 </body>
