@@ -433,6 +433,9 @@ function doAutoFill(tab){
   const covN =parseInt(document.getElementById("cov-N-"+tab).value)||4;
   const covRM=parseInt(document.getElementById("cov-RM-"+tab).value)||1;
   const covRT=parseInt(document.getElementById("cov-RT-"+tab).value)||1;
+  // Franco limits per day: min 2, max 6, ideal 3-4
+  const FRANCO_MAX_DAY = 6;
+  const FRANCO_IDEAL   = 4;
 
   const cfgMap={};
   readCfgFromDOM(tab).forEach(c=>{cfgMap[c.name]=c;});
@@ -479,6 +482,7 @@ function doAutoFill(tab){
       const v=String(calState[tab][r][c]||"").trim().toUpperCase();
       row.push(v); lck.push(v!=="");
     }
+    // Mark partial unavailable days as "-" immediately
     if(cfg.availability==="Disponibilidad parcial"){
       (cfg.partialDays||"").split(",").forEach(s=>{
         const d=parseInt(s.trim())-1;
@@ -488,92 +492,128 @@ function doAutoFill(tab){
     shifts[name]=row; locked[name]=lck;
   });
 
-  // HELPERS
+  // ── HELPERS ──
+  // Count how many employees have a given shift on day d
   function countDay(d,type){ return allEmp.filter(e=>shifts[e.name][d]===type).length; }
+  // Count francos on a given day across all employees
+  function francosOnDay(d){ return allEmp.filter(e=>shifts[e.name][d]==="F").length; }
+  // Assign and lock
   function assign(name,d,type){ shifts[name][d]=type; locked[name][d]=true; }
+  // Is cell free?
   function isFree(name,d){ return !locked[name][d]; }
+  // Can employee do a shift type? Empty turnTypes = all allowed
   function canDo(cfg,type){
-    if(!cfg.turnTypes) return true;
+    if(!cfg.turnTypes||cfg.turnTypes.trim()==="") return true;
     return cfg.turnTypes.split(",").map(s=>s.trim()).includes(type);
   }
+  // Can assign a franco on this day? (respect daily franco cap)
+  function canAssignFranco(d){
+    return francosOnDay(d) < FRANCO_MAX_DAY;
+  }
 
-  // ── PHASE 1: TITULARES ──
+  // ════════════════════════════════════════════
+  // PHASE 1 — TITULARES
+  // ════════════════════════════════════════════
 
-  // 1a: 2 consecutive N nights per titular (if N allowed), never single
+  // 1a: assign exactly 2 consecutive N nights per titular (only if N is allowed)
+  //     Titulares NEVER get single nights — consecutive pair only, or nothing.
   titular.forEach(e=>{
     if(!canDo(e.cfg,"N")) return;
-    if(shifts[e.name].filter(v=>v==="N").length>=2) return;
+    if(shifts[e.name].filter(v=>v==="N").length>=2) return; // already set manually
     for(let d=0;d<numDays-1;d++){
       if(isFree(e.name,d)&&isFree(e.name,d+1)&&
          countDay(d,"N")<covN&&countDay(d+1,"N")<covN){
-        assign(e.name,d,"N"); assign(e.name,d+1,"N"); return;
+        assign(e.name,d,"N");
+        assign(e.name,d+1,"N");
+        return;
       }
     }
+    // No consecutive pair found: leave free, will be filled with M/T below
   });
 
-  // 1b: francos for titulares — 1 or 2 per week, guarantee minimum 8
+  // 1b: distribute francos for titulares — 1 or 2 per week, respect daily cap
+  //     Priority: spread across weeks, avoid days that already have too many francos
   titular.forEach(e=>{
     let totalF=shifts[e.name].filter(v=>v==="F").length;
+    // Pass 1: week by week, 1-2 per week
     weekMap.forEach(wDays=>{
       if(totalF>=9) return;
-      const free=wDays.filter(d=>isFree(e.name,d));
+      // Free days this week sorted by current franco load (prefer days with fewer francos)
+      const free=wDays
+        .filter(d=>isFree(e.name,d)&&canAssignFranco(d))
+        .sort((a,b)=>francosOnDay(a)-francosOnDay(b));
       if(!free.length) return;
       const want=Math.min(free.length>=4?2:1, 9-totalF);
-      const picks=want===2?[free[0],free[Math.floor(free.length/2)]]:[free[0]];
-      picks.forEach(d=>{assign(e.name,d,"F");totalF++;});
+      // Pick day with least francos, then the last available (spread within week)
+      const picks=[free[0]];
+      if(want===2&&free.length>=2) picks.push(free[free.length-1]);
+      picks.forEach(d=>{
+        if(canAssignFranco(d)){assign(e.name,d,"F");totalF++;}
+      });
     });
-    // Guarantee minimum 8 francos
+    // Pass 2: ensure minimum 8 francos, respecting daily cap
     for(let d=0;d<numDays&&totalF<8;d++){
-      if(isFree(e.name,d)){assign(e.name,d,"F");totalF++;}
+      if(isFree(e.name,d)&&canAssignFranco(d)){assign(e.name,d,"F");totalF++;}
     }
   });
 
-  // 1c: fill M and T for titulares
+  // 1c: fill M and T for titulares on remaining free days
+  //     Go day by day; shuffle pool for fairness across titulares
   for(let d=0;d<numDays;d++){
     let needM=Math.max(0,covM-countDay(d,"M"));
     let needT=Math.max(0,covT-countDay(d,"T"));
     const pool=titular.filter(e=>isFree(e.name,d));
     pool.sort(()=>Math.random()-.5);
     pool.forEach(e=>{
-      if(needM>0&&canDo(e.cfg,"M")){assign(e.name,d,"M");needM--;}
+      if     (needM>0&&canDo(e.cfg,"M")){assign(e.name,d,"M");needM--;}
       else if(needT>0&&canDo(e.cfg,"T")){assign(e.name,d,"T");needT--;}
     });
   }
 
-  // 1d: any remaining free cell for titulares → "-"
+  // 1d: still free cells for titulares?
+  //     Titulares NEVER get "-" automatically unless canDo allows it.
+  //     Assign M or T to fill (coverage may exceed target, but no cell left empty).
   titular.forEach(e=>{
     for(let d=0;d<numDays;d++){
-      if(isFree(e.name,d)) assign(e.name,d,"-");
+      if(!isFree(e.name,d)) continue;
+      // Try M first, then T, then F (if within cap), then "-" ONLY if allowed
+      if     (canDo(e.cfg,"M"))                   assign(e.name,d,"M");
+      else if(canDo(e.cfg,"T"))                   assign(e.name,d,"T");
+      else if(canDo(e.cfg,"F")&&canAssignFranco(d)) assign(e.name,d,"F");
+      else if(canDo(e.cfg,"-"))                   assign(e.name,d,"-");
+      else                                         assign(e.name,d,"M"); // absolute fallback
     }
   });
 
-  // ── PHASE 2: SUPLENTES 1 ──
+  // ════════════════════════════════════════════
+  // PHASE 2 — SUPLENTES 1
+  // ════════════════════════════════════════════
 
-  // 2a: RM and RT
+  // 2a: RM and RT (primary role of sup1)
   for(let d=0;d<numDays;d++){
     let needRM=Math.max(0,covRM-countDay(d,"RM"));
     let needRT=Math.max(0,covRT-countDay(d,"RT"));
     const pool=sup1.filter(e=>isFree(e.name,d));
     pool.sort(()=>Math.random()-.5);
     pool.forEach(e=>{
-      if(needRM>0&&canDo(e.cfg,"RM")){assign(e.name,d,"RM");needRM--;}
+      if     (needRM>0&&canDo(e.cfg,"RM")){assign(e.name,d,"RM");needRM--;}
       else if(needRT>0&&canDo(e.cfg,"RT")){assign(e.name,d,"RT");needRT--;}
     });
   }
 
-  // 2b: remaining M and T
+  // 2b: fill remaining M and T coverage
   for(let d=0;d<numDays;d++){
     let needM=Math.max(0,covM-countDay(d,"M"));
     let needT=Math.max(0,covT-countDay(d,"T"));
     const pool=sup1.filter(e=>isFree(e.name,d));
     pool.sort(()=>Math.random()-.5);
     pool.forEach(e=>{
-      if(needM>0&&canDo(e.cfg,"M")){assign(e.name,d,"M");needM--;}
+      if     (needM>0&&canDo(e.cfg,"M")){assign(e.name,d,"M");needM--;}
       else if(needT>0&&canDo(e.cfg,"T")){assign(e.name,d,"T");needT--;}
     });
   }
 
-  // 2c: remaining N (no limit, no consecutive)
+  // 2c: fill remaining N coverage (no limit, no consecutive)
   for(let d=0;d<numDays;d++){
     let needN=Math.max(0,covN-countDay(d,"N"));
     const pool=sup1.filter(e=>isFree(e.name,d)&&canDo(e.cfg,"N"));
@@ -581,32 +621,43 @@ function doAutoFill(tab){
     pool.slice(0,needN).forEach(e=>assign(e.name,d,"N"));
   }
 
-  // 2d: francos for sup1 — 1 or 2 per week
+  // 2d: francos for sup1 — 1 or 2 per week, respect daily cap
   sup1.forEach(e=>{
     let totalF=shifts[e.name].filter(v=>v==="F").length;
     weekMap.forEach(wDays=>{
       if(totalF>=11) return;
-      const free=wDays.filter(d=>isFree(e.name,d));
+      const free=wDays
+        .filter(d=>isFree(e.name,d)&&canAssignFranco(d))
+        .sort((a,b)=>francosOnDay(a)-francosOnDay(b));
       if(!free.length) return;
       const want=Math.min(free.length>=4?2:1, 11-totalF);
-      const picks=want===2?[free[0],free[Math.floor(free.length/2)]]:[free[0]];
-      picks.forEach(d=>{assign(e.name,d,"F");totalF++;});
+      const picks=[free[0]];
+      if(want===2&&free.length>=2) picks.push(free[free.length-1]);
+      picks.forEach(d=>{
+        if(canAssignFranco(d)){assign(e.name,d,"F");totalF++;}
+      });
     });
     for(let d=0;d<numDays&&totalF<8;d++){
-      if(isFree(e.name,d)){assign(e.name,d,"F");totalF++;}
+      if(isFree(e.name,d)&&canAssignFranco(d)){assign(e.name,d,"F");totalF++;}
     }
   });
 
-  // 2e: remaining free cells for sup1 → "-"
+  // 2e: remaining free cells for sup1 → "-" (only if allowed, else assign best turn)
   sup1.forEach(e=>{
     for(let d=0;d<numDays;d++){
-      if(isFree(e.name,d)) assign(e.name,d,"-");
+      if(!isFree(e.name,d)) continue;
+      if(canDo(e.cfg,"-")) assign(e.name,d,"-");
+      else if(canDo(e.cfg,"M")) assign(e.name,d,"M");
+      else if(canDo(e.cfg,"T")) assign(e.name,d,"T");
+      else assign(e.name,d,"-");
     }
   });
 
-  // ── PHASE 3: SUPLENTES 2 ──
+  // ════════════════════════════════════════════
+  // PHASE 3 — SUPLENTES 2
+  // ════════════════════════════════════════════
 
-  // 3a: fill any remaining coverage slots
+  // 3a: fill any remaining coverage (M, T, N, RM, RT)
   for(let d=0;d<numDays;d++){
     let needM =Math.max(0,covM -countDay(d,"M"));
     let needT =Math.max(0,covT -countDay(d,"T"));
@@ -631,7 +682,7 @@ function doAutoFill(tab){
     }
   });
 
-  // WRITE BACK
+  // ── WRITE BACK ──
   allEmp.forEach(({r,name})=>{
     for(let c=1;c<=numDays;c++) calState[tab][r][c]=shifts[name][c-1];
   });
