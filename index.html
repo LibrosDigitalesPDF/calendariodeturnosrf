@@ -19,12 +19,12 @@
 
     /* HEADER */
     header{background:var(--hbg);color:var(--htxt);padding:1rem 2rem .8rem;display:flex;align-items:flex-end;gap:1rem}
-    header h1{font-size:1.4rem;font-weight:normal;letter-spacing:.05em;font-family:'Arial',Arial,sans-serif;text-transform:uppercase}
-    header span{font-size:.78rem;opacity:.65;font-family:'Arial',Arial,sans-serif;padding-bottom:1px}
+    header h1{font-size:1.4rem;font-weight:normal;letter-spacing:.05em;text-transform:uppercase}
+    header span{font-size:.78rem;opacity:.65;padding-bottom:1px}
 
     /* TABS */
     .tabs-bar{background:#fff;border-bottom:1px solid var(--border);display:flex;padding:0 2rem}
-    .tab-btn{padding:.75rem 1.35rem;border:none;background:#eae8e3;color:var(--muted);font-family:'Arial',Arial,sans-serif;font-size:.76rem;letter-spacing:.06em;text-transform:uppercase;cursor:pointer;border-right:1px solid var(--border);border-top:3px solid transparent;position:relative;top:1px;transition:background .15s}
+    .tab-btn{padding:.75rem 1.35rem;border:none;background:#eae8e3;color:var(--muted);font-size:.76rem;letter-spacing:.06em;text-transform:uppercase;cursor:pointer;border-right:1px solid var(--border);border-top:3px solid transparent;transition:background .15s}
     .tab-btn:first-child{border-left:1px solid var(--border)}
     .tab-btn.active{background:#fff;color:var(--accent);border-top:3px solid var(--accent);font-weight:bold}
     .tab-btn:hover:not(.active){background:#ddd}
@@ -33,25 +33,25 @@
 
     /* TOOLBAR */
     .toolbar{display:flex;flex-wrap:wrap;align-items:center;gap:.45rem;margin-bottom:.9rem;padding:.55rem .8rem;background:#fff;border:1px solid var(--border);border-radius:6px}
-    .toolbar label{font-family:'Arial',Arial,sans-serif;font-size:.73rem;color:var(--muted)}
-    .toolbar select,.toolbar input[type=number]{font-family:'Arial',Arial,sans-serif;font-size:.76rem;padding:.26rem .42rem;border:1px solid var(--border);border-radius:4px;background:#fff}
-    .btn{display:inline-flex;align-items:center;gap:.28rem;padding:.32rem .8rem;border:none;border-radius:4px;font-family:'Arial',Arial,sans-serif;font-size:.73rem;letter-spacing:.03em;cursor:pointer;transition:opacity .15s,transform .1s;white-space:nowrap}
+    .toolbar label{font-size:.73rem;color:var(--muted)}
+    .toolbar select,.toolbar input[type=number]{font-size:.76rem;padding:.26rem .42rem;border:1px solid var(--border);border-radius:4px;background:#fff}
+    .btn{display:inline-flex;align-items:center;gap:.28rem;padding:.32rem .8rem;border:none;border-radius:4px;font-size:.73rem;letter-spacing:.03em;cursor:pointer;transition:opacity .15s,transform .1s;white-space:nowrap}
     .btn:active{transform:scale(.97)}
     .btn-blue{background:var(--accent);color:#fff}.btn-blue:hover{opacity:.88}
     .btn-green{background:var(--green);color:#fff}.btn-green:hover{opacity:.88}
     .btn-purple{background:#6a3fa0;color:#fff}.btn-purple:hover{opacity:.88}
     .btn-red{background:#b52020;color:#fff}.btn-red:hover{opacity:.88}
-    .badge{display:inline-block;padding:.12rem .38rem;border-radius:3px;font-size:.67rem;font-family:'Arial',Arial,sans-serif}
+    .badge{display:inline-block;padding:.12rem .38rem;border-radius:3px;font-size:.67rem}
     .badge-ok{background:var(--green-light);color:var(--green)}
     .badge-err{background:var(--red-light);color:var(--red)}
 
     /* COBERTURA */
-    .cover-bar{display:flex;flex-wrap:wrap;align-items:center;gap:.5rem;margin-bottom:.9rem;padding:.45rem .8rem;background:#fffbe6;border:1px solid #e0c060;border-radius:5px;font-family:'Arial',Arial,sans-serif;font-size:.73rem;color:#5a4200}
+    .cover-bar{display:flex;flex-wrap:wrap;align-items:center;gap:.5rem;margin-bottom:.9rem;padding:.45rem .8rem;background:#fffbe6;border:1px solid #e0c060;border-radius:5px;font-size:.73rem;color:#5a4200}
     .cover-bar label{display:flex;align-items:center;gap:.25rem}
-    .cover-bar input[type=number]{width:42px;padding:.2rem .28rem;border:1px solid #ccc;border-radius:3px;font-family:'Arial',Arial,sans-serif;font-size:.73rem;text-align:center}
+    .cover-bar input[type=number]{width:42px;padding:.2rem .28rem;border:1px solid #ccc;border-radius:3px;text-align:center}
 
     /* LEGEND */
-    .legend{display:flex;flex-wrap:wrap;gap:.35rem;margin-bottom:.85rem;font-family:'Arial',Arial,sans-serif;font-size:.68rem}
+    .legend{display:flex;flex-wrap:wrap;gap:.35rem;margin-bottom:.85rem;font-size:.68rem}
     .leg{padding:.12rem .38rem;border-radius:3px;border:1px solid #ddd;background:#fff;color:var(--text)}
     .leg-F{background:#444;color:#fff;border-color:#444}
     .leg-N{background:#ccc;color:#222;border-color:#bbb}
@@ -59,14 +59,16 @@
     /* TABLE */
     .table-wrapper{overflow-x:auto;border-radius:6px;box-shadow:var(--shadow);border:1px solid var(--border);margin-bottom:1.5rem}
     table{border-collapse:collapse;min-width:100%;background:#fff;font-size:.77rem}
-    thead th{background:var(--hbg);color:#fff;padding:.4rem .42rem;text-align:center;font-family:'Arial',Arial,sans-serif;font-weight:normal;border-right:1px solid rgba(255,255,255,.15);white-space:nowrap;min-width:33px}
+    thead th{background:var(--hbg);color:#fff;padding:.4rem .42rem;text-align:center;font-weight:normal;border-right:1px solid rgba(255,255,255,.15);white-space:nowrap;min-width:33px}
     thead th:first-child{text-align:left;min-width:145px;padding-left:.75rem}
     tbody td{padding:.3rem .38rem;text-align:center;border-right:1px solid var(--border);border-bottom:1px solid var(--border);white-space:nowrap;min-width:33px}
-    tbody td:first-child{text-align:left;font-family:'Arial',Arial,sans-serif;font-size:.74rem;padding-left:.65rem;font-weight:bold;background:#f0efe9;position:sticky;left:0;z-index:1;border-right:2px solid var(--border);min-width:145px}
+    tbody td:first-child{text-align:left;font-size:.74rem;padding-left:.65rem;font-weight:bold;background:#f0efe9;position:sticky;left:0;z-index:1;border-right:2px solid var(--border);min-width:145px}
     tbody tr:nth-child(even) td:not(.cell-F):not(.cell-N){background:var(--row-alt)}
     tbody tr:nth-child(even) td:first-child{background:#ebe9e2}
+    
     .cell-F{background:#444!important;color:#fff!important;font-weight:bold}
     .cell-N{background:#ccc!important;color:#222!important;font-weight:bold}
+
     [contenteditable="true"]{outline:none;cursor:text}
     [contenteditable="true"]:focus{outline:2px solid #f0c040!important;outline-offset:-2px;background:#fffbe6!important}
     thead th[contenteditable="true"]:focus{background:#1045a0!important}
@@ -74,49 +76,39 @@
     .day-num{font-size:.78rem;font-weight:bold}
     .day-letter{font-size:.62rem;opacity:.8}
     .add-row-row td{background:#f5f4ef!important;text-align:center!important;padding:.16rem}
-    .btn-add-row{background:none;border:1px dashed #bbb;border-radius:3px;color:var(--muted);font-size:.7rem;font-family:'Arial',Arial,sans-serif;padding:.16rem .55rem;cursor:pointer;width:100%}
+    .btn-add-row{background:none;border:1px dashed #bbb;border-radius:3px;color:var(--muted);font-size:.7rem;padding:.16rem .55rem;cursor:pointer;width:100%}
     .btn-add-row:hover{background:var(--accent-light);color:var(--accent);border-color:var(--accent)}
 
     /* CONFIG PANEL */
     .cfg-panel{background:#fff;border:1px solid var(--border);border-radius:6px;padding:.9rem 1.1rem;margin-bottom:1.2rem}
-    .cfg-panel h3{font-family:'Arial',Arial,sans-serif;font-size:.78rem;color:var(--accent);letter-spacing:.07em;text-transform:uppercase;margin-bottom:.75rem;border-bottom:1px solid var(--border);padding-bottom:.38rem}
+    .cfg-panel h3{font-size:.78rem;color:var(--accent);letter-spacing:.07em;text-transform:uppercase;margin-bottom:.75rem;border-bottom:1px solid var(--border);padding-bottom:.38rem}
     .cfg-table{width:100%;border-collapse:collapse;font-size:.74rem}
-    .cfg-table th{background:#f0efe9;padding:.32rem .45rem;font-family:'Arial',Arial,sans-serif;font-weight:normal;font-size:.68rem;color:var(--muted);border:1px solid var(--border);text-align:left;white-space:nowrap}
+    .cfg-table th{background:#f0efe9;padding:.32rem .45rem;font-weight:normal;font-size:.68rem;color:var(--muted);border:1px solid var(--border);text-align:left;white-space:nowrap}
     .cfg-table td{padding:.28rem .4rem;border:1px solid var(--border);vertical-align:middle}
-    .cfg-table td:first-child{font-weight:bold;font-family:'Arial',Arial,sans-serif;background:#f9f8f5;min-width:130px;font-size:.73rem}
-    .cfg-table select{font-family:'Arial',Arial,sans-serif;font-size:.72rem;padding:.2rem .3rem;border:1px solid var(--border);border-radius:3px;background:#fff;cursor:pointer;width:100%}
-    .cfg-table input[type=text]{font-family:'Arial',Arial,sans-serif;font-size:.7rem;padding:.2rem .32rem;border:1px solid var(--border);border-radius:3px;width:110px}
+    .cfg-table td:first-child{font-weight:bold;background:#f9f8f5;min-width:130px;font-size:.73rem}
+    .cfg-table select{font-size:.72rem;padding:.2rem .3rem;border:1px solid var(--border);border-radius:3px;background:#fff;cursor:pointer;width:100%}
+    .cfg-table input[type=text]{font-size:.7rem;padding:.2rem .32rem;border:1px solid var(--border);border-radius:3px;width:110px}
     .partial-days{display:none;margin-top:.25rem}
     .partial-days input{width:110px}
-    /* priority row colors */
     .row-titular td:first-child{border-left:3px solid #185FA5}
     .row-sup1 td:first-child{border-left:3px solid #6a3fa0}
     .row-sup2 td:first-child{border-left:3px solid #b55a00}
-
-    /* multi-select turnos */
     .turn-checks{display:flex;flex-wrap:wrap;gap:.2rem}
-    .turn-checks label{display:inline-flex;align-items:center;gap:.18rem;font-family:'Arial',Arial,sans-serif;font-size:.68rem;cursor:pointer;padding:.1rem .25rem;border:1px solid #ddd;border-radius:3px;background:#f9f9f9}
+    .turn-checks label{display:inline-flex;align-items:center;gap:.18rem;font-size:.68rem;cursor:pointer;padding:.1rem .25rem;border:1px solid #ddd;border-radius:3px;background:#f9f9f9}
     .turn-checks label:hover{background:var(--accent-light)}
     .turn-checks input{cursor:pointer;width:12px;height:12px}
 
-    /* loading */
-    .loading,.msg-error{padding:2.5rem 2rem;text-align:center;font-family:'Arial',Arial,sans-serif;font-size:.83rem;color:var(--muted)}
+    /* loading & modals */
+    .loading,.msg-error{padding:2.5rem 2rem;text-align:center;font-size:.83rem;color:var(--muted)}
     .msg-error{color:var(--red)}
     .spinner{display:inline-block;width:14px;height:14px;border:2px solid #B5D4F4;border-top-color:var(--accent);border-radius:50%;animation:spin .7s linear infinite;vertical-align:middle;margin-right:6px}
     @keyframes spin{to{transform:rotate(360deg)}}
-
-    /* confirm modal */
     .modal-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.45);z-index:100;align-items:center;justify-content:center}
     .modal-overlay.open{display:flex}
-    .modal-box{background:#fff;border-radius:8px;padding:1.5rem 2rem;max-width:340px;text-align:center;font-family:'Arial',Arial,sans-serif;font-size:.82rem;box-shadow:0 4px 20px rgba(0,0,0,.2)}
+    .modal-box{background:#fff;border-radius:8px;padding:1.5rem 2rem;max-width:340px;text-align:center;font-size:.82rem;box-shadow:0 4px 20px rgba(0,0,0,.2)}
     .modal-box h4{font-size:.95rem;margin-bottom:.6rem;color:var(--red)}
     .modal-box p{margin-bottom:1.1rem;color:var(--muted);font-size:.77rem}
     .modal-btns{display:flex;gap:.6rem;justify-content:center}
-
-    @media(max-width:640px){
-      .tab-content{padding:.7rem .35rem 2rem}
-      .toolbar,.cover-bar{gap:.3rem}
-    }
   </style>
 </head>
 <body>
@@ -134,7 +126,6 @@
 <div id="tab-current" class="tab-content active"></div>
 <div id="tab-next"    class="tab-content"></div>
 
-<!-- Confirm modal -->
 <div class="modal-overlay" id="confirm-modal">
   <div class="modal-box">
     <h4>⚠ Vaciar cronograma</h4>
@@ -423,7 +414,7 @@ function doClear(tab){
   });
 }
 
-/* ── AUTO FILL ── */
+/* ── AUTO FILL (Ajusta alrededor de la Edición Manual) ── */
 function doAutoFill(tab){
   syncTable(tab);
   if(!calState[tab]||calState[tab].length<2){setStatus(tab,"Sin datos","badge-err");return;}
@@ -433,9 +424,7 @@ function doAutoFill(tab){
   const covN =parseInt(document.getElementById("cov-N-"+tab).value)||4;
   const covRM=parseInt(document.getElementById("cov-RM-"+tab).value)||1;
   const covRT=parseInt(document.getElementById("cov-RT-"+tab).value)||1;
-  // Franco limits per day: min 2, max 6, ideal 3-4
   const FRANCO_MAX_DAY = 6;
-  const FRANCO_IDEAL   = 4;
 
   const cfgMap={};
   readCfgFromDOM(tab).forEach(c=>{cfgMap[c.name]=c;});
@@ -444,14 +433,12 @@ function doAutoFill(tab){
   let numDays=0;
   for(let c=1;c<header.length;c++){if(String(header[c]||"").trim()==="")break;numDays++;}
 
-  // Day-of-week letters from header
   const dayDOW=[];
   for(let c=1;c<=numDays;c++){
     const raw=String(header[c]||"").trim();
     dayDOW.push((raw.split(/\n|\r/)[1]||"").trim());
   }
 
-  // Build week boundaries (split on "L" = Lunes)
   const weekMap=[];
   let wIdx=0; weekMap.push([]);
   for(let d=0;d<numDays;d++){
@@ -459,7 +446,6 @@ function doAutoFill(tab){
     weekMap[wIdx].push(d);
   }
 
-  // Collect employees
   const empRows=[];
   for(let r=1;r<calState[tab].length;r++){
     const name=String(calState[tab][r][0]||"").trim();
@@ -474,15 +460,13 @@ function doAutoFill(tab){
   const sup2   =empRows.filter(e=>e.cfg.priority==="Suplente 2");
   const allEmp =[...titular,...sup1,...sup2];
 
-  // shifts[name][d] = value, locked[name][d] = bool
   const shifts={}, locked={};
   allEmp.forEach(({r,name,cfg})=>{
     const row=[], lck=[];
     for(let c=1;c<=numDays;c++){
       const v=String(calState[tab][r][c]||"").trim().toUpperCase();
-      row.push(v); lck.push(v!=="");
+      row.push(v); lck.push(v!==""); // TODO LO CARGADO A MANO SE BLOQUEA Y RESPETA
     }
-    // Mark partial unavailable days as "-" immediately
     if(cfg.availability==="Disponibilidad parcial"){
       (cfg.partialDays||"").split(",").forEach(s=>{
         const d=parseInt(s.trim())-1;
@@ -492,73 +476,65 @@ function doAutoFill(tab){
     shifts[name]=row; locked[name]=lck;
   });
 
-  // ── HELPERS ──
-  // Count how many employees have a given shift on day d
   function countDay(d,type){ return allEmp.filter(e=>shifts[e.name][d]===type).length; }
-  // Count francos on a given day across all employees
   function francosOnDay(d){ return allEmp.filter(e=>shifts[e.name][d]==="F").length; }
-  // Assign and lock
   function assign(name,d,type){ shifts[name][d]=type; locked[name][d]=true; }
-  // Is cell free?
   function isFree(name,d){ return !locked[name][d]; }
-  // Can employee do a shift type? Empty turnTypes = all allowed
   function canDo(cfg,type){
     if(!cfg.turnTypes||cfg.turnTypes.trim()==="") return true;
     return cfg.turnTypes.split(",").map(s=>s.trim()).includes(type);
   }
-  // Can assign a franco on this day? (respect daily franco cap)
-  function canAssignFranco(d){
-    return francosOnDay(d) < FRANCO_MAX_DAY;
-  }
+  function canAssignFranco(d){ return francosOnDay(d) < FRANCO_MAX_DAY; }
 
-  // ════════════════════════════════════════════
-  // PHASE 1 — TITULARES
-  // ════════════════════════════════════════════
+  // 0. PRE-PASO: Analizar manuales y rodear Noches manuales con Francos
+  titular.forEach(e => {
+    for (let d = 0; d < numDays; d++) {
+      if (shifts[e.name][d] === "N") {
+        // Si el día siguiente no es N (terminó el bloque manual de N)
+        if (d + 1 >= numDays || shifts[e.name][d + 1] !== "N") {
+          // Asigna franco a los dos días libres siguientes
+          if (d + 1 < numDays && isFree(e.name, d + 1)) assign(e.name, d + 1, "F");
+          if (d + 2 < numDays && isFree(e.name, d + 2)) assign(e.name, d + 2, "F");
+        }
+      }
+    }
+  });
 
-  // 1a: assign exactly 2 consecutive N nights per titular (only if N is allowed)
-  //     Titulares NEVER get single nights — consecutive pair only, or nothing.
+  // ════ PHASE 1 — TITULARES ════
+
+  // 1a: Asignar bloque automático N-N e inmediatamente bloquear F-F
   titular.forEach(e=>{
     if(!canDo(e.cfg,"N")) return;
-    if(shifts[e.name].filter(v=>v==="N").length>=2) return; // already set manually
+    if(shifts[e.name].filter(v=>v==="N").length>=2) return; 
     for(let d=0;d<numDays-1;d++){
-      if(isFree(e.name,d)&&isFree(e.name,d+1)&&
-         countDay(d,"N")<covN&&countDay(d+1,"N")<covN){
+      if(isFree(e.name,d)&&isFree(e.name,d+1)&&countDay(d,"N")<covN&&countDay(d+1,"N")<covN){
         assign(e.name,d,"N");
         assign(e.name,d+1,"N");
+        if(d+2 < numDays) assign(e.name, d+2, "F");
+        if(d+3 < numDays) assign(e.name, d+3, "F");
         return;
       }
     }
-    // No consecutive pair found: leave free, will be filled with M/T below
   });
 
-  // 1b: distribute francos for titulares — 1 or 2 per week, respect daily cap
-  //     Priority: spread across weeks, avoid days that already have too many francos
+  // 1b: Distribuir Francos restantes para Titulares
   titular.forEach(e=>{
     let totalF=shifts[e.name].filter(v=>v==="F").length;
-    // Pass 1: week by week, 1-2 per week
     weekMap.forEach(wDays=>{
       if(totalF>=9) return;
-      // Free days this week sorted by current franco load (prefer days with fewer francos)
-      const free=wDays
-        .filter(d=>isFree(e.name,d)&&canAssignFranco(d))
-        .sort((a,b)=>francosOnDay(a)-francosOnDay(b));
+      const free=wDays.filter(d=>isFree(e.name,d)&&canAssignFranco(d)).sort((a,b)=>francosOnDay(a)-francosOnDay(b));
       if(!free.length) return;
       const want=Math.min(free.length>=4?2:1, 9-totalF);
-      // Pick day with least francos, then the last available (spread within week)
       const picks=[free[0]];
       if(want===2&&free.length>=2) picks.push(free[free.length-1]);
-      picks.forEach(d=>{
-        if(canAssignFranco(d)){assign(e.name,d,"F");totalF++;}
-      });
+      picks.forEach(d=>{ if(canAssignFranco(d)){assign(e.name,d,"F");totalF++;} });
     });
-    // Pass 2: ensure minimum 8 francos, respecting daily cap
     for(let d=0;d<numDays&&totalF<8;d++){
       if(isFree(e.name,d)&&canAssignFranco(d)){assign(e.name,d,"F");totalF++;}
     }
   });
 
-  // 1c: fill M and T for titulares on remaining free days
-  //     Go day by day; shuffle pool for fairness across titulares
+  // 1c: Llenar M y T para titulares
   for(let d=0;d<numDays;d++){
     let needM=Math.max(0,covM-countDay(d,"M"));
     let needT=Math.max(0,covT-countDay(d,"T"));
@@ -570,26 +546,19 @@ function doAutoFill(tab){
     });
   }
 
-  // 1d: still free cells for titulares?
-  //     Titulares NEVER get "-" automatically unless canDo allows it.
-  //     Assign M or T to fill (coverage may exceed target, but no cell left empty).
+  // 1d: Fallback Titulares
   titular.forEach(e=>{
     for(let d=0;d<numDays;d++){
       if(!isFree(e.name,d)) continue;
-      // Try M first, then T, then F (if within cap), then "-" ONLY if allowed
       if     (canDo(e.cfg,"M"))                   assign(e.name,d,"M");
       else if(canDo(e.cfg,"T"))                   assign(e.name,d,"T");
       else if(canDo(e.cfg,"F")&&canAssignFranco(d)) assign(e.name,d,"F");
       else if(canDo(e.cfg,"-"))                   assign(e.name,d,"-");
-      else                                         assign(e.name,d,"M"); // absolute fallback
+      else                                         assign(e.name,d,"M");
     }
   });
 
-  // ════════════════════════════════════════════
-  // PHASE 2 — SUPLENTES 1
-  // ════════════════════════════════════════════
-
-  // 2a: RM and RT (primary role of sup1)
+  // ════ PHASE 2 — SUPLENTES 1 ════
   for(let d=0;d<numDays;d++){
     let needRM=Math.max(0,covRM-countDay(d,"RM"));
     let needRT=Math.max(0,covRT-countDay(d,"RT"));
@@ -600,8 +569,6 @@ function doAutoFill(tab){
       else if(needRT>0&&canDo(e.cfg,"RT")){assign(e.name,d,"RT");needRT--;}
     });
   }
-
-  // 2b: fill remaining M and T coverage
   for(let d=0;d<numDays;d++){
     let needM=Math.max(0,covM-countDay(d,"M"));
     let needT=Math.max(0,covT-countDay(d,"T"));
@@ -612,37 +579,27 @@ function doAutoFill(tab){
       else if(needT>0&&canDo(e.cfg,"T")){assign(e.name,d,"T");needT--;}
     });
   }
-
-  // 2c: fill remaining N coverage (no limit, no consecutive)
   for(let d=0;d<numDays;d++){
     let needN=Math.max(0,covN-countDay(d,"N"));
     const pool=sup1.filter(e=>isFree(e.name,d)&&canDo(e.cfg,"N"));
     pool.sort(()=>Math.random()-.5);
     pool.slice(0,needN).forEach(e=>assign(e.name,d,"N"));
   }
-
-  // 2d: francos for sup1 — 1 or 2 per week, respect daily cap
   sup1.forEach(e=>{
     let totalF=shifts[e.name].filter(v=>v==="F").length;
     weekMap.forEach(wDays=>{
       if(totalF>=11) return;
-      const free=wDays
-        .filter(d=>isFree(e.name,d)&&canAssignFranco(d))
-        .sort((a,b)=>francosOnDay(a)-francosOnDay(b));
+      const free=wDays.filter(d=>isFree(e.name,d)&&canAssignFranco(d)).sort((a,b)=>francosOnDay(a)-francosOnDay(b));
       if(!free.length) return;
       const want=Math.min(free.length>=4?2:1, 11-totalF);
       const picks=[free[0]];
       if(want===2&&free.length>=2) picks.push(free[free.length-1]);
-      picks.forEach(d=>{
-        if(canAssignFranco(d)){assign(e.name,d,"F");totalF++;}
-      });
+      picks.forEach(d=>{ if(canAssignFranco(d)){assign(e.name,d,"F");totalF++;} });
     });
     for(let d=0;d<numDays&&totalF<8;d++){
       if(isFree(e.name,d)&&canAssignFranco(d)){assign(e.name,d,"F");totalF++;}
     }
   });
-
-  // 2e: remaining free cells for sup1 → "-" (only if allowed, else assign best turn)
   sup1.forEach(e=>{
     for(let d=0;d<numDays;d++){
       if(!isFree(e.name,d)) continue;
@@ -653,11 +610,7 @@ function doAutoFill(tab){
     }
   });
 
-  // ════════════════════════════════════════════
-  // PHASE 3 — SUPLENTES 2
-  // ════════════════════════════════════════════
-
-  // 3a: fill any remaining coverage (M, T, N, RM, RT)
+  // ════ PHASE 3 — SUPLENTES 2 ════
   for(let d=0;d<numDays;d++){
     let needM =Math.max(0,covM -countDay(d,"M"));
     let needT =Math.max(0,covT -countDay(d,"T"));
@@ -674,12 +627,8 @@ function doAutoFill(tab){
       else if(needRT>0&&canDo(e.cfg,"RT")){assign(e.name,d,"RT");needRT--;}
     });
   }
-
-  // 3b: all remaining free cells for sup2 → "-"
   sup2.forEach(e=>{
-    for(let d=0;d<numDays;d++){
-      if(isFree(e.name,d)) assign(e.name,d,"-");
-    }
+    for(let d=0;d<numDays;d++){ if(isFree(e.name,d)) assign(e.name,d,"-"); }
   });
 
   // ── WRITE BACK ──
