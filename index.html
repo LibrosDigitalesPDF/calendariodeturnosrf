@@ -79,7 +79,7 @@
     .btn-add-row{background:none;border:1px dashed #bbb;border-radius:3px;color:var(--muted);font-size:.7rem;padding:.16rem .55rem;cursor:pointer;width:100%}
     .btn-add-row:hover{background:var(--accent-light);color:var(--accent);border-color:var(--accent)}
 
-    /* CONFIG PANEL */
+    /* CONFIG PANEL - ROLES */
     .cfg-panel{background:#fff;border:1px solid var(--border);border-radius:6px;padding:.9rem 1.1rem;margin-bottom:1.2rem}
     .cfg-panel h3{font-size:.78rem;color:var(--accent);letter-spacing:.07em;text-transform:uppercase;margin-bottom:.75rem;border-bottom:1px solid var(--border);padding-bottom:.38rem}
     .cfg-table{width:100%;border-collapse:collapse;font-size:.74rem}
@@ -90,9 +90,12 @@
     .cfg-table input[type=text]{font-size:.7rem;padding:.2rem .32rem;border:1px solid var(--border);border-radius:3px;width:110px}
     .partial-days{display:none;margin-top:.25rem}
     .partial-days input{width:110px}
-    .row-titular td:first-child{border-left:3px solid #185FA5}
-    .row-sup1 td:first-child{border-left:3px solid #6a3fa0}
-    .row-sup2 td:first-child{border-left:3px solid #b55a00}
+    
+    .row-rotativo td:first-child{border-left:3px solid #185FA5} /* Azul */
+    .row-fijo td:first-child{border-left:3px solid #1a7a3a}     /* Verde */
+    .row-ancla td:first-child{border-left:3px solid #6a3fa0}    /* Violeta */
+    .row-comodin td:first-child{border-left:3px solid #b55a00}  /* Naranja */
+
     .turn-checks{display:flex;flex-wrap:wrap;gap:.2rem}
     .turn-checks label{display:inline-flex;align-items:center;gap:.18rem;font-size:.68rem;cursor:pointer;padding:.1rem .25rem;border:1px solid #ddd;border-radius:3px;background:#f9f9f9}
     .turn-checks label:hover{background:var(--accent-light)}
@@ -142,14 +145,14 @@ const API="https://script.google.com/macros/s/AKfycbzP-qBzVytXwMXTU67z8i4MFUYENU
 const MESES=["ENERO","FEBRERO","MARZO","ABRIL","MAYO","JUNIO","JULIO","AGOSTO","SEPTIEMBRE","OCTUBRE","NOVIEMBRE","DICIEMBRE"];
 const DIAS=["D","L","MA","MI","J","V","S"];
 const ALL_TURNS=["M","T","N","F","RM","RT","-"];
-const PRIORITIES=["Titular","Suplente 1","Suplente 2"];
+// Nuevos Roles Funcionales
+const PRIORITIES=["Rotativo", "Soporte Fijo", "Ancla Nocturna", "Comodín"];
 
 const calState={current:null,next:null};
 const cfgState={current:[],next:[]};
 const loaded={};
 let cbN=0, pendingClearTab=null;
 
-/* ── JSONP ── */
 function jsonp(params,cb){
   const name="__cb"+(++cbN);
   const qs=Object.entries(params).map(([k,v])=>k+"="+encodeURIComponent(v)).join("&");
@@ -161,7 +164,6 @@ function jsonp(params,cb){
   document.head.appendChild(s);
 }
 
-/* ── TABS ── */
 function switchTab(tab,btn){
   document.querySelectorAll(".tab-btn").forEach(b=>b.classList.remove("active"));
   document.querySelectorAll(".tab-content").forEach(c=>c.classList.remove("active"));
@@ -185,7 +187,6 @@ function loadTab(tab){
   });
 }
 
-/* ── RENDER ── */
 function render(tab){
   const now=new Date();
   const defM=tab==="next"?(now.getMonth()+1)%12:now.getMonth();
@@ -207,7 +208,7 @@ function render(tab){
     <strong>Cobertura/día:</strong>
     <label>M:<input type="number" id="cov-M-${tab}"  value="3" min="1" max="20"></label>
     <label>T:<input type="number" id="cov-T-${tab}"  value="3" min="1" max="20"></label>
-    <label>N:<input type="number" id="cov-N-${tab}"  value="4" min="1" max="20"></label>
+    <label>N:<input type="number" id="cov-N-${tab}"  value="2" min="1" max="20"></label>
     <label>RM:<input type="number" id="cov-RM-${tab}" value="1" min="0" max="10"></label>
     <label>RT:<input type="number" id="cov-RT-${tab}" value="1" min="0" max="10"></label>
   </div>`;
@@ -227,7 +228,6 @@ function render(tab){
   document.getElementById("tab-"+tab).innerHTML=html;
 }
 
-/* ── BUILD TABLE ── */
 function buildTable(tab,rows){
   if(!rows||rows.length===0) return '<div class="msg-error">Sin datos. Usá "Generar mes" para inicializar.</div>';
   const header=rows[0];
@@ -272,13 +272,21 @@ function cellCls(v){
   return "";
 }
 
-/* ── BUILD CONFIG PANEL ── */
 function buildCfgPanel(tab){
   const names=getNames(tab);
   const cfgMap={};
-  (cfgState[tab]||[]).forEach(c=>{cfgMap[c.name]=c;});
+  
+  // Migración automática si en Google Sheets tienen guardados los roles viejos
+  (cfgState[tab]||[]).forEach(c=>{
+    let prio = c.priority || "Rotativo";
+    if(prio === "Titular") prio = "Rotativo";
+    if(prio === "Suplente 1") prio = "Soporte Fijo";
+    if(prio === "Suplente 2") prio = "Comodín";
+    c.priority = prio;
+    cfgMap[c.name]=c;
+  });
 
-  const priorityOrder={"Titular":0,"Suplente 1":1,"Suplente 2":2};
+  const priorityOrder={"Rotativo":0,"Soporte Fijo":1,"Ancla Nocturna":2,"Comodín":3};
   const sorted=[...names].sort((a,b)=>{
     const pa=priorityOrder[(cfgMap[a]||{}).priority]??99;
     const pb=priorityOrder[(cfgMap[b]||{}).priority]??99;
@@ -286,19 +294,24 @@ function buildCfgPanel(tab){
   });
 
   let html=`<div class="cfg-panel">
-  <h3>⚙ Configuración de empleados</h3>
+  <h3>⚙ Configuración de Roles y Empleados</h3>
   <div style="overflow-x:auto">
   <table class="cfg-table">
     <thead><tr>
       <th>Empleado</th>
       <th>Disponibilidad</th>
-      <th>Prioridad</th>
+      <th>Rol Funcional</th>
       <th>Turnos disponibles</th>
     </tr></thead><tbody id="cfg-body-${tab}">`;
 
   sorted.forEach(name=>{
-    const c=cfgMap[name]||{name,availability:"Disponible",partialDays:"",priority:"Titular",turnTypes:""};
-    const pClass=c.priority==="Titular"?"row-titular":c.priority==="Suplente 1"?"row-sup1":"row-sup2";
+    const c=cfgMap[name]||{name,availability:"Disponible",partialDays:"",priority:"Rotativo",turnTypes:""};
+    
+    let pClass = "row-rotativo";
+    if(c.priority === "Soporte Fijo") pClass = "row-fijo";
+    if(c.priority === "Ancla Nocturna") pClass = "row-ancla";
+    if(c.priority === "Comodín") pClass = "row-comodin";
+
     const selTurns=(c.turnTypes||"").split(",").map(s=>s.trim()).filter(Boolean);
     const showPartial=c.availability==="Disponibilidad parcial"?"block":"none";
 
@@ -347,13 +360,13 @@ function togglePartial(sel){
 function updateRowClass(sel){
   const tr=sel.closest("tr");
   if(!tr) return;
-  tr.classList.remove("row-titular","row-sup1","row-sup2");
-  if(sel.value==="Titular") tr.classList.add("row-titular");
-  else if(sel.value==="Suplente 1") tr.classList.add("row-sup1");
-  else tr.classList.add("row-sup2");
+  tr.classList.remove("row-rotativo","row-fijo","row-ancla","row-comodin");
+  if(sel.value==="Rotativo") tr.classList.add("row-rotativo");
+  else if(sel.value==="Soporte Fijo") tr.classList.add("row-fijo");
+  else if(sel.value==="Ancla Nocturna") tr.classList.add("row-ancla");
+  else tr.classList.add("row-comodin");
 }
 
-/* ── CELL EDIT ── */
 function cellEdit(el){
   const tab=el.dataset.tab,r=parseInt(el.dataset.r),c=parseInt(el.dataset.c);
   ensureCell(tab,r,c);
@@ -381,7 +394,6 @@ function addEmployee(tab){
   if(tds[0]){tds[0].focus();selAll(tds[0]);}
 }
 
-/* ── INIT MONTH ── */
 function doInitMonth(tab){
   const month=parseInt(document.getElementById("sel-m-"+tab).value);
   const year =parseInt(document.getElementById("sel-y-"+tab).value);
@@ -394,7 +406,6 @@ function doInitMonth(tab){
   });
 }
 
-/* ── CLEAR ── */
 function askClear(tab){
   pendingClearTab=tab;
   document.getElementById("confirm-modal").classList.add("open");
@@ -414,14 +425,14 @@ function doClear(tab){
   });
 }
 
-/* ── AUTO FILL (Ajusta alrededor de la Edición Manual) ── */
+/* ── MOTOR INTELIGENTE DE DISTRIBUCIÓN ── */
 function doAutoFill(tab){
   syncTable(tab);
   if(!calState[tab]||calState[tab].length<2){setStatus(tab,"Sin datos","badge-err");return;}
 
   const covM =parseInt(document.getElementById("cov-M-"+tab).value)||3;
   const covT =parseInt(document.getElementById("cov-T-"+tab).value)||3;
-  const covN =parseInt(document.getElementById("cov-N-"+tab).value)||4;
+  const covN =parseInt(document.getElementById("cov-N-"+tab).value)||2;
   const covRM=parseInt(document.getElementById("cov-RM-"+tab).value)||1;
   const covRT=parseInt(document.getElementById("cov-RT-"+tab).value)||1;
   const FRANCO_MAX_DAY = 6;
@@ -450,22 +461,30 @@ function doAutoFill(tab){
   for(let r=1;r<calState[tab].length;r++){
     const name=String(calState[tab][r][0]||"").trim();
     if(!name) continue;
-    const cfg=cfgMap[name]||{availability:"Disponible",priority:"Titular",turnTypes:"",partialDays:""};
+    let prio = cfgMap[name]?.priority || "Rotativo";
+    if(prio === "Titular") prio = "Rotativo";
+    if(prio === "Suplente 1") prio = "Soporte Fijo";
+    if(prio === "Suplente 2") prio = "Comodín";
+
+    const cfg=cfgMap[name]||{availability:"Disponible",priority:prio,turnTypes:"",partialDays:""};
     if(cfg.availability==="No disponible") continue;
     empRows.push({r,name,cfg});
   }
 
-  const titular=empRows.filter(e=>e.cfg.priority==="Titular");
-  const sup1   =empRows.filter(e=>e.cfg.priority==="Suplente 1");
-  const sup2   =empRows.filter(e=>e.cfg.priority==="Suplente 2");
-  const allEmp =[...titular,...sup1,...sup2];
+  // Separación por Roles
+  const rotativos = empRows.filter(e=>e.cfg.priority==="Rotativo");
+  const fijos     = empRows.filter(e=>e.cfg.priority==="Soporte Fijo");
+  const anclas    = empRows.filter(e=>e.cfg.priority==="Ancla Nocturna");
+  const comodines = empRows.filter(e=>e.cfg.priority==="Comodín");
 
+  const allEmp =[...rotativos,...fijos,...anclas,...comodines];
   const shifts={}, locked={};
+  
   allEmp.forEach(({r,name,cfg})=>{
     const row=[], lck=[];
     for(let c=1;c<=numDays;c++){
       const v=String(calState[tab][r][c]||"").trim().toUpperCase();
-      row.push(v); lck.push(v!==""); // TODO LO CARGADO A MANO SE BLOQUEA Y RESPETA
+      row.push(v); lck.push(v!==""); // Bloqueamos edición manual
     }
     if(cfg.availability==="Disponibilidad parcial"){
       (cfg.partialDays||"").split(",").forEach(s=>{
@@ -477,22 +496,18 @@ function doAutoFill(tab){
   });
 
   function countDay(d,type){ return allEmp.filter(e=>shifts[e.name][d]===type).length; }
-  function francosOnDay(d){ return allEmp.filter(e=>shifts[e.name][d]==="F").length; }
   function assign(name,d,type){ shifts[name][d]=type; locked[name][d]=true; }
   function isFree(name,d){ return !locked[name][d]; }
   function canDo(cfg,type){
     if(!cfg.turnTypes||cfg.turnTypes.trim()==="") return true;
     return cfg.turnTypes.split(",").map(s=>s.trim()).includes(type);
   }
-  function canAssignFranco(d){ return francosOnDay(d) < FRANCO_MAX_DAY; }
 
-  // 0. PRE-PASO: Analizar manuales y rodear Noches manuales con Francos
-  titular.forEach(e => {
+  // PASO 0: Protección de turnos N manuales (Asegurar F-F)
+  allEmp.forEach(e => {
     for (let d = 0; d < numDays; d++) {
       if (shifts[e.name][d] === "N") {
-        // Si el día siguiente no es N (terminó el bloque manual de N)
         if (d + 1 >= numDays || shifts[e.name][d + 1] !== "N") {
-          // Asigna franco a los dos días libres siguientes
           if (d + 1 < numDays && isFree(e.name, d + 1)) assign(e.name, d + 1, "F");
           if (d + 2 < numDays && isFree(e.name, d + 2)) assign(e.name, d + 2, "F");
         }
@@ -500,147 +515,130 @@ function doAutoFill(tab){
     }
   });
 
-  // ════ PHASE 1 — TITULARES ════
-
-  // 1a: Asignar bloque automático N-N e inmediatamente bloquear F-F
-  titular.forEach(e=>{
-    if(!canDo(e.cfg,"N")) return;
-    if(shifts[e.name].filter(v=>v==="N").length>=2) return; 
-    for(let d=0;d<numDays-1;d++){
-      if(isFree(e.name,d)&&isFree(e.name,d+1)&&countDay(d,"N")<covN&&countDay(d+1,"N")<covN){
-        assign(e.name,d,"N");
-        assign(e.name,d+1,"N");
-        if(d+2 < numDays) assign(e.name, d+2, "F");
-        if(d+3 < numDays) assign(e.name, d+3, "F");
-        return;
+  // PASO 1: Soporte Fijo
+  fijos.forEach(e => {
+    for(let d=0; d<numDays; d++){
+      if(!isFree(e.name, d)) continue;
+      const isWeekend = (dayDOW[d] === "S" || dayDOW[d] === "D");
+      if(isWeekend) {
+         assign(e.name, d, "F");
+      } else {
+         const pref = ["RM", "RT", "M", "T"].find(t => canDo(e.cfg, t));
+         if(pref) assign(e.name, d, pref);
       }
     }
   });
 
-  // 1b: Distribuir Francos restantes para Titulares
-  titular.forEach(e=>{
-    let totalF=shifts[e.name].filter(v=>v==="F").length;
-    weekMap.forEach(wDays=>{
-      if(totalF>=9) return;
-      const free=wDays.filter(d=>isFree(e.name,d)&&canAssignFranco(d)).sort((a,b)=>francosOnDay(a)-francosOnDay(b));
-      if(!free.length) return;
-      const want=Math.min(free.length>=4?2:1, 9-totalF);
-      const picks=[free[0]];
-      if(want===2&&free.length>=2) picks.push(free[free.length-1]);
-      picks.forEach(d=>{ if(canAssignFranco(d)){assign(e.name,d,"F");totalF++;} });
-    });
-    for(let d=0;d<numDays&&totalF<8;d++){
-      if(isFree(e.name,d)&&canAssignFranco(d)){assign(e.name,d,"F");totalF++;}
+  // PASO 2: Anclas Nocturnas
+  anclas.forEach(e => {
+    for(let d=0; d<numDays; d++){
+      if(!isFree(e.name, d)) continue;
+      let prev = d > 0 ? shifts[e.name][d-1] : null;
+      let prev2 = d > 1 ? shifts[e.name][d-2] : null;
+
+      if(prev === "N" && prev2 !== "N") assign(e.name, d, "N");
+      else if(prev === "N" && prev2 === "N") assign(e.name, d, "F");
+      else if(prev === "F" && prev2 === "N") assign(e.name, d, "F");
+      else {
+         if(countDay(d, "N") < covN && canDo(e.cfg, "N")) assign(e.name, d, "N");
+         else assign(e.name, d, "F");
+      }
     }
   });
 
-  // 1c: Llenar M y T para titulares
-  for(let d=0;d<numDays;d++){
-    let needM=Math.max(0,covM-countDay(d,"M"));
-    let needT=Math.max(0,covT-countDay(d,"T"));
-    const pool=titular.filter(e=>isFree(e.name,d));
-    pool.sort(()=>Math.random()-.5);
-    pool.forEach(e=>{
-      if     (needM>0&&canDo(e.cfg,"M")){assign(e.name,d,"M");needM--;}
-      else if(needT>0&&canDo(e.cfg,"T")){assign(e.name,d,"T");needT--;}
-    });
-  }
-
-  // 1d: Fallback Titulares
-  titular.forEach(e=>{
-    for(let d=0;d<numDays;d++){
-      if(!isFree(e.name,d)) continue;
-      if     (canDo(e.cfg,"M"))                   assign(e.name,d,"M");
-      else if(canDo(e.cfg,"T"))                   assign(e.name,d,"T");
-      else if(canDo(e.cfg,"F")&&canAssignFranco(d)) assign(e.name,d,"F");
-      else if(canDo(e.cfg,"-"))                   assign(e.name,d,"-");
-      else                                         assign(e.name,d,"M");
+  // PASO 3: Rotativos
+  // 3A: Garantizar 1 fin de semana libre por empleado
+  rotativos.forEach((e, i) => {
+    let weekOffset = i % weekMap.length;
+    for(let w=0; w<weekMap.length; w++) {
+       let targetWeek = (w + weekOffset) % weekMap.length;
+       let wDays = weekMap[targetWeek];
+       let sat = wDays.find(d => dayDOW[d] === "S");
+       let sun = wDays.find(d => dayDOW[d] === "D");
+       if(sat !== undefined && sun !== undefined && isFree(e.name, sat) && isFree(e.name, sun)) {
+           assign(e.name, sat, "F");
+           assign(e.name, sun, "F");
+           break;
+       }
     }
   });
 
-  // ════ PHASE 2 — SUPLENTES 1 ════
-  for(let d=0;d<numDays;d++){
-    let needRM=Math.max(0,covRM-countDay(d,"RM"));
-    let needRT=Math.max(0,covRT-countDay(d,"RT"));
-    const pool=sup1.filter(e=>isFree(e.name,d));
-    pool.sort(()=>Math.random()-.5);
-    pool.forEach(e=>{
-      if     (needRM>0&&canDo(e.cfg,"RM")){assign(e.name,d,"RM");needRM--;}
-      else if(needRT>0&&canDo(e.cfg,"RT")){assign(e.name,d,"RT");needRT--;}
-    });
-  }
-  for(let d=0;d<numDays;d++){
-    let needM=Math.max(0,covM-countDay(d,"M"));
-    let needT=Math.max(0,covT-countDay(d,"T"));
-    const pool=sup1.filter(e=>isFree(e.name,d));
-    pool.sort(()=>Math.random()-.5);
-    pool.forEach(e=>{
-      if     (needM>0&&canDo(e.cfg,"M")){assign(e.name,d,"M");needM--;}
-      else if(needT>0&&canDo(e.cfg,"T")){assign(e.name,d,"T");needT--;}
-    });
-  }
-  for(let d=0;d<numDays;d++){
-    let needN=Math.max(0,covN-countDay(d,"N"));
-    const pool=sup1.filter(e=>isFree(e.name,d)&&canDo(e.cfg,"N"));
-    pool.sort(()=>Math.random()-.5);
-    pool.slice(0,needN).forEach(e=>assign(e.name,d,"N"));
-  }
-  sup1.forEach(e=>{
-    let totalF=shifts[e.name].filter(v=>v==="F").length;
-    weekMap.forEach(wDays=>{
-      if(totalF>=11) return;
-      const free=wDays.filter(d=>isFree(e.name,d)&&canAssignFranco(d)).sort((a,b)=>francosOnDay(a)-francosOnDay(b));
-      if(!free.length) return;
-      const want=Math.min(free.length>=4?2:1, 11-totalF);
-      const picks=[free[0]];
-      if(want===2&&free.length>=2) picks.push(free[free.length-1]);
-      picks.forEach(d=>{ if(canAssignFranco(d)){assign(e.name,d,"F");totalF++;} });
-    });
-    for(let d=0;d<numDays&&totalF<8;d++){
-      if(isFree(e.name,d)&&canAssignFranco(d)){assign(e.name,d,"F");totalF++;}
-    }
-  });
-  sup1.forEach(e=>{
-    for(let d=0;d<numDays;d++){
-      if(!isFree(e.name,d)) continue;
-      if(canDo(e.cfg,"-")) assign(e.name,d,"-");
-      else if(canDo(e.cfg,"M")) assign(e.name,d,"M");
-      else if(canDo(e.cfg,"T")) assign(e.name,d,"T");
-      else assign(e.name,d,"-");
+ // 3B: Máquina de estados (M -> F -> T -> F -> N) y bloques de 3-5 días
+  const rotPhaseOrder = ["M", "T", "N"];
+  rotativos.forEach((e, i) => {
+    let currentPhase = rotPhaseOrder[i % 3]; // Offset para que no todos empiecen en el mismo turno
+    let streak = 0;
+
+    for(let d=0; d<numDays; d++) {
+        let v = shifts[e.name][d];
+        if(v !== "") {
+            if(v === "M" || v === "T" || v === "N") { currentPhase = v; streak++; } 
+            else if(v === "F") streak = 0;
+            continue; // Evita pisar la entrada manual, pero actualiza el streak
+        }
+
+        let prev = d > 0 ? shifts[e.name][d-1] : null;
+        if(prev === "M" || prev === "T") {
+            if(streak < 3) { assign(e.name, d, prev); streak++; } 
+            else if (streak >= 5) { assign(e.name, d, "F"); streak = 0; } 
+            else {
+                let need = prev === "M" ? (covM - countDay(d, "M")) : (covT - countDay(d, "T"));
+                if(need > 0) { assign(e.name, d, prev); streak++; }
+                else { assign(e.name, d, "F"); streak = 0; }
+            }
+        } else if(prev === "N") {
+            if(streak < 2) { assign(e.name, d, "N"); streak++; }
+            else { assign(e.name, d, "F"); streak = 0; }
+        } else {
+            // Transición a la siguiente fase
+            let nextPhase = "M";
+            if(currentPhase === "M") nextPhase = "T";
+            else if(currentPhase === "T") nextPhase = "N";
+            else if(currentPhase === "N") nextPhase = "M";
+
+            if(canDo(e.cfg, nextPhase)) {
+               assign(e.name, d, nextPhase);
+               currentPhase = nextPhase;
+               streak = 1;
+            } else {
+               assign(e.name, d, "F"); 
+            }
+        }
     }
   });
 
-  // ════ PHASE 3 — SUPLENTES 2 ════
-  for(let d=0;d<numDays;d++){
-    let needM =Math.max(0,covM -countDay(d,"M"));
-    let needT =Math.max(0,covT -countDay(d,"T"));
-    let needN =Math.max(0,covN -countDay(d,"N"));
-    let needRM=Math.max(0,covRM-countDay(d,"RM"));
-    let needRT=Math.max(0,covRT-countDay(d,"RT"));
-    const pool=sup2.filter(e=>isFree(e.name,d));
-    pool.sort(()=>Math.random()-.5);
-    pool.forEach(e=>{
-      if     (needM >0&&canDo(e.cfg,"M")) {assign(e.name,d,"M"); needM--;}
-      else if(needT >0&&canDo(e.cfg,"T")) {assign(e.name,d,"T"); needT--;}
-      else if(needN >0&&canDo(e.cfg,"N")) {assign(e.name,d,"N"); needN--;}
-      else if(needRM>0&&canDo(e.cfg,"RM")){assign(e.name,d,"RM");needRM--;}
-      else if(needRT>0&&canDo(e.cfg,"RT")){assign(e.name,d,"RT");needRT--;}
+  // PASO 4: Comodines y Parche Final
+  for(let d=0; d<numDays; d++){
+    ["RM","RT","M","T","N"].forEach(turn => {
+      let need = 0;
+      if(turn==="RM") need = covRM - countDay(d,"RM");
+      if(turn==="RT") need = covRT - countDay(d,"RT");
+      if(turn==="M")  need = covM - countDay(d,"M");
+      if(turn==="T")  need = covT - countDay(d,"T");
+      if(turn==="N")  need = covN - countDay(d,"N");
+
+      if(need > 0) {
+        let pool = comodines.filter(e=>isFree(e.name,d) && canDo(e.cfg, turn));
+        pool.sort(()=>Math.random()-.5);
+        pool.slice(0, need).forEach(e=>assign(e.name,d,turn));
+      }
     });
   }
-  sup2.forEach(e=>{
-    for(let d=0;d<numDays;d++){ if(isFree(e.name,d)) assign(e.name,d,"-"); }
+
+  // Dejar libre lo que los comodines no cubran
+  comodines.forEach(e => {
+    for(let d=0;d<numDays;d++) if(isFree(e.name,d)) assign(e.name,d,"-");
   });
 
-  // ── WRITE BACK ──
+  // ── ESCRITURA ──
   allEmp.forEach(({r,name})=>{
     for(let c=1;c<=numDays;c++) calState[tab][r][c]=shifts[name][c-1];
   });
 
   render(tab);
-  setStatus(tab,"✓ Turnos distribuidos","badge-ok");
+  setStatus(tab,"✓ Turnos distribuidos (Inteligente)","badge-ok");
 }
 
-/* ── SAVE CALENDAR ── */
 function doSave(tab){
   syncTable(tab);
   if(!calState[tab]){setStatus(tab,"Sin datos","badge-err");return;}
@@ -652,14 +650,12 @@ function doSave(tab){
   });
 }
 
-/* ── SAVE CONFIG ── */
 function readCfgFromDOM(tab){
   const result=[];
   getNames(tab).forEach(name=>{
-    const key=name.replace(/\s/g,"_");
     const avail=document.querySelector(`.cfg-avail[data-name="${name}"][data-tab="${tab}"]`)?.value||"Disponible";
     const partial=document.querySelector(`.cfg-partial[data-name="${name}"][data-tab="${tab}"]`)?.value||"";
-    const prio=document.querySelector(`.cfg-prio[data-name="${name}"][data-tab="${tab}"]`)?.value||"Titular";
+    const prio=document.querySelector(`.cfg-prio[data-name="${name}"][data-tab="${tab}"]`)?.value||"Rotativo";
     const chks=[...document.querySelectorAll(`.chk-turn[data-name="${name}"][data-tab="${tab}"]:checked`)].map(c=>c.value);
     result.push({name,availability:avail,partialDays:partial,priority:prio,turnTypes:chks.join(",")});
   });
@@ -680,7 +676,6 @@ function saveCfg(tab){
   });
 }
 
-/* ── HELPERS ── */
 function getNames(tab){
   const names=[];
   if(!calState[tab]) return names;
@@ -711,7 +706,6 @@ function esc(s){
   return String(s).replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/"/g,"&quot;");
 }
 
-/* ── INIT ── */
 loadTab("current");
 </script>
 </body>
