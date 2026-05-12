@@ -1,712 +1,571 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-  <meta charset="UTF-8"/>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Cronograma</title>
+  <meta charset="UTF-8">
+  <title>Sistema de Gestión Inteligente de Turnos</title>
   <style>
-    *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
-    :root{
-      --bg:#f2f1ed;--surface:#fff;--border:#ddd;
-      --text:#1a1a18;--muted:#6b6860;
-      --accent:#185FA5;--accent-light:#E6F1FB;
-      --hbg:#185FA5;--htxt:#fff;
-      --row-alt:#f9f8f5;--shadow:0 1px 4px rgba(0,0,0,.08);
-      --green:#1a7a3a;--green-light:#e6f5ec;
-      --red:#a32d2d;--red-light:#fde8e8;
+    /* Estilos Globales y Variables */
+    :root {
+      --bg-color: #f4f6f9;
+      --card-bg: #ffffff;
+      --border-color: #cbd5e1;
+      --text-main: #1e293b;
+      --text-muted: #64748b;
+      --primary: #0284c7;
+      --primary-hover: #0369a1;
+      --success: #16a34a;
+      --success-hover: #15803d;
+      --danger: #dc2626;
+      --danger-hover: #b91c1c;
+      --warning-bg: #fef08a;
+      --warning-border: #facc15;
+      
+      /* Colores de Categoría de Trabajadores */
+      --cat-titular: #e0f2fe;
+      --cat-refuerzo: #fef3c7;
+      --cat-nocturno: #f3e8ff;
+      --cat-comodin: #e2e8f0;
     }
-    body{font-family:'Arial',Arial,sans-serif;background:var(--bg);color:var(--text);min-height:100vh}
-
-    /* HEADER */
-    header{background:var(--hbg);color:var(--htxt);padding:1rem 2rem .8rem;display:flex;align-items:flex-end;gap:1rem}
-    header h1{font-size:1.4rem;font-weight:normal;letter-spacing:.05em;text-transform:uppercase}
-    header span{font-size:.78rem;opacity:.65;padding-bottom:1px}
-
-    /* TABS */
-    .tabs-bar{background:#fff;border-bottom:1px solid var(--border);display:flex;padding:0 2rem}
-    .tab-btn{padding:.75rem 1.35rem;border:none;background:#eae8e3;color:var(--muted);font-size:.76rem;letter-spacing:.06em;text-transform:uppercase;cursor:pointer;border-right:1px solid var(--border);border-top:3px solid transparent;transition:background .15s}
-    .tab-btn:first-child{border-left:1px solid var(--border)}
-    .tab-btn.active{background:#fff;color:var(--accent);border-top:3px solid var(--accent);font-weight:bold}
-    .tab-btn:hover:not(.active){background:#ddd}
-    .tab-content{display:none;padding:1.2rem 1.5rem 3rem}
-    .tab-content.active{display:block}
-
-    /* TOOLBAR */
-    .toolbar{display:flex;flex-wrap:wrap;align-items:center;gap:.45rem;margin-bottom:.9rem;padding:.55rem .8rem;background:#fff;border:1px solid var(--border);border-radius:6px}
-    .toolbar label{font-size:.73rem;color:var(--muted)}
-    .toolbar select,.toolbar input[type=number]{font-size:.76rem;padding:.26rem .42rem;border:1px solid var(--border);border-radius:4px;background:#fff}
-    .btn{display:inline-flex;align-items:center;gap:.28rem;padding:.32rem .8rem;border:none;border-radius:4px;font-size:.73rem;letter-spacing:.03em;cursor:pointer;transition:opacity .15s,transform .1s;white-space:nowrap}
-    .btn:active{transform:scale(.97)}
-    .btn-blue{background:var(--accent);color:#fff}.btn-blue:hover{opacity:.88}
-    .btn-green{background:var(--green);color:#fff}.btn-green:hover{opacity:.88}
-    .btn-purple{background:#6a3fa0;color:#fff}.btn-purple:hover{opacity:.88}
-    .btn-red{background:#b52020;color:#fff}.btn-red:hover{opacity:.88}
-    .badge{display:inline-block;padding:.12rem .38rem;border-radius:3px;font-size:.67rem}
-    .badge-ok{background:var(--green-light);color:var(--green)}
-    .badge-err{background:var(--red-light);color:var(--red)}
-
-    /* COBERTURA */
-    .cover-bar{display:flex;flex-wrap:wrap;align-items:center;gap:.5rem;margin-bottom:.9rem;padding:.45rem .8rem;background:#fffbe6;border:1px solid #e0c060;border-radius:5px;font-size:.73rem;color:#5a4200}
-    .cover-bar label{display:flex;align-items:center;gap:.25rem}
-    .cover-bar input[type=number]{width:42px;padding:.2rem .28rem;border:1px solid #ccc;border-radius:3px;text-align:center}
-
-    /* LEGEND */
-    .legend{display:flex;flex-wrap:wrap;gap:.35rem;margin-bottom:.85rem;font-size:.68rem}
-    .leg{padding:.12rem .38rem;border-radius:3px;border:1px solid #ddd;background:#fff;color:var(--text)}
-    .leg-F{background:#444;color:#fff;border-color:#444}
-    .leg-N{background:#ccc;color:#222;border-color:#bbb}
-
-    /* TABLE */
-    .table-wrapper{overflow-x:auto;border-radius:6px;box-shadow:var(--shadow);border:1px solid var(--border);margin-bottom:1.5rem}
-    table{border-collapse:collapse;min-width:100%;background:#fff;font-size:.77rem}
-    thead th{background:var(--hbg);color:#fff;padding:.4rem .42rem;text-align:center;font-weight:normal;border-right:1px solid rgba(255,255,255,.15);white-space:nowrap;min-width:33px}
-    thead th:first-child{text-align:left;min-width:145px;padding-left:.75rem}
-    tbody td{padding:.3rem .38rem;text-align:center;border-right:1px solid var(--border);border-bottom:1px solid var(--border);white-space:nowrap;min-width:33px}
-    tbody td:first-child{text-align:left;font-size:.74rem;padding-left:.65rem;font-weight:bold;background:#f0efe9;position:sticky;left:0;z-index:1;border-right:2px solid var(--border);min-width:145px}
-    tbody tr:nth-child(even) td:not(.cell-F):not(.cell-N){background:var(--row-alt)}
-    tbody tr:nth-child(even) td:first-child{background:#ebe9e2}
     
-    .cell-F{background:#444!important;color:#fff!important;font-weight:bold}
-    .cell-N{background:#ccc!important;color:#222!important;font-weight:bold}
-
-    [contenteditable="true"]{outline:none;cursor:text}
-    [contenteditable="true"]:focus{outline:2px solid #f0c040!important;outline-offset:-2px;background:#fffbe6!important}
-    thead th[contenteditable="true"]:focus{background:#1045a0!important}
-    .day-header{display:flex;flex-direction:column;align-items:center;line-height:1.2}
-    .day-num{font-size:.78rem;font-weight:bold}
-    .day-letter{font-size:.62rem;opacity:.8}
-    .add-row-row td{background:#f5f4ef!important;text-align:center!important;padding:.16rem}
-    .btn-add-row{background:none;border:1px dashed #bbb;border-radius:3px;color:var(--muted);font-size:.7rem;padding:.16rem .55rem;cursor:pointer;width:100%}
-    .btn-add-row:hover{background:var(--accent-light);color:var(--accent);border-color:var(--accent)}
-
-    /* CONFIG PANEL - ROLES */
-    .cfg-panel{background:#fff;border:1px solid var(--border);border-radius:6px;padding:.9rem 1.1rem;margin-bottom:1.2rem}
-    .cfg-panel h3{font-size:.78rem;color:var(--accent);letter-spacing:.07em;text-transform:uppercase;margin-bottom:.75rem;border-bottom:1px solid var(--border);padding-bottom:.38rem}
-    .cfg-table{width:100%;border-collapse:collapse;font-size:.74rem}
-    .cfg-table th{background:#f0efe9;padding:.32rem .45rem;font-weight:normal;font-size:.68rem;color:var(--muted);border:1px solid var(--border);text-align:left;white-space:nowrap}
-    .cfg-table td{padding:.28rem .4rem;border:1px solid var(--border);vertical-align:middle}
-    .cfg-table td:first-child{font-weight:bold;background:#f9f8f5;min-width:130px;font-size:.73rem}
-    .cfg-table select{font-size:.72rem;padding:.2rem .3rem;border:1px solid var(--border);border-radius:3px;background:#fff;cursor:pointer;width:100%}
-    .cfg-table input[type=text]{font-size:.7rem;padding:.2rem .32rem;border:1px solid var(--border);border-radius:3px;width:110px}
-    .partial-days{display:none;margin-top:.25rem}
-    .partial-days input{width:110px}
+    *, *::before, *::after {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
     
-    .row-rotativo td:first-child{border-left:3px solid #185FA5} /* Azul */
-    .row-fijo td:first-child{border-left:3px solid #1a7a3a}     /* Verde */
-    .row-ancla td:first-child{border-left:3px solid #6a3fa0}    /* Violeta */
-    .row-comodin td:first-child{border-left:3px solid #b55a00}  /* Naranja */
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background-color: var(--bg-color);
+      color: var(--text-main);
+      padding: 20px;
+      padding-bottom: 60px;
+    }
+    
+    header {
+      margin-bottom: 20px;
+      border-bottom: 2px solid var(--border-color);
+      padding-bottom: 10px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    
+    header h1 {
+      font-size: 1.6rem;
+      color: var(--primary);
+    }
+    
+    /* Barra de Herramientas (Botones) */
+    .toolbar {
+      display: flex;
+      gap: 12px;
+      margin-bottom: 20px;
+      flex-wrap: wrap;
+      background: var(--card-bg);
+      padding: 14px;
+      border-radius: 8px;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+      border: 1px solid var(--border-color);
+    }
+    
+    .btn {
+      padding: 10px 18px;
+      font-size: 0.9rem;
+      font-weight: 600;
+      border: none;
+      border-radius: 6px;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      transition: all 0.2s ease;
+    }
+    
+    .btn-primary { background-color: var(--primary); color: #fff; }
+    .btn-primary:hover { background-color: var(--primary-hover); }
+    
+    .btn-success { background-color: var(--success); color: #fff; }
+    .btn-success:hover { background-color: var(--success-hover); }
+    
+    .btn-danger { background-color: var(--danger); color: #fff; }
+    .btn-danger:hover { background-color: var(--danger-hover); }
+    
+    .btn:disabled {
+      opacity: 0.6;
+      cursor: not-allowed;
+    }
+    
+    /* Contenedor de la Tabla */
+    .table-container {
+      overflow-x: auto;
+      background: var(--card-bg);
+      border-radius: 8px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+      border: 1px solid var(--border-color);
+      margin-bottom: 30px;
+    }
+    
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 0.85rem;
+      text-align: center;
+    }
+    
+    thead th {
+      background-color: #f8fafc;
+      color: var(--text-main);
+      padding: 10px 6px;
+      border-bottom: 2px solid var(--border-color);
+      border-right: 1px solid var(--border-color);
+      font-weight: 600;
+      white-space: pre-line;
+      min-width: 42px;
+      line-height: 1.2;
+    }
+    
+    thead th:first-child {
+      text-align: left;
+      padding-left: 16px;
+      min-width: 180px;
+      position: sticky;
+      left: 0;
+      z-index: 10;
+      background-color: #f8fafc;
+    }
+    
+    tbody td {
+      padding: 8px 4px;
+      border-bottom: 1px solid #e2e8f0;
+      border-right: 1px solid #e2e8f0;
+      font-weight: 600;
+      transition: background-color 0.1s;
+      height: 38px;
+    }
+    
+    tbody td:first-child {
+      text-align: left;
+      padding-left: 16px;
+      position: sticky;
+      left: 0;
+      background-color: #ffffff;
+      border-right: 2px solid var(--border-color);
+      z-index: 5;
+    }
+    
+    /* Reglas de Estilos Dinámicos de Celda */
+    .cell-shift {
+      cursor: pointer;
+      user-select: none;
+    }
+    
+    /* F: Fondo gris oscuro, texto blanco mayúscula */
+    .shift-F {
+      background-color: #334155 !important;
+      color: #ffffff !important;
+    }
+    
+    /* N: Fondo gris claro, texto negro mayúscula */
+    .shift-N {
+      background-color: #cbd5e1 !important;
+      color: #000000 !important;
+    }
+    
+    /* Resto de siglas: Fondo blanco, texto negro */
+    .shift-standard {
+      background-color: #ffffff;
+      color: #000000;
+    }
+    
+    /* Excepción F > 12: Celda visualmente vacía */
+    .shift-empty-override {
+      background-color: #ffffff !important;
+      color: transparent !important;
+    }
+    
+    /* Colores Indicadores de Categoría en la Columna de Nombres */
+    .cat-badge-Titular { border-left: 5px solid #0284c7; }
+    .cat-badge-Refuerzo { border-left: 5px solid #d97706; }
+    .cat-badge-Nocturno { border-left: 5px solid #9333ea; }
+    .cat-badge-Comodin { border-left: 5px solid #475569; }
 
-    .turn-checks{display:flex;flex-wrap:wrap;gap:.2rem}
-    .turn-checks label{display:inline-flex;align-items:center;gap:.18rem;font-size:.68rem;cursor:pointer;padding:.1rem .25rem;border:1px solid #ddd;border-radius:3px;background:#f9f9f9}
-    .turn-checks label:hover{background:var(--accent-light)}
-    .turn-checks input{cursor:pointer;width:12px;height:12px}
-
-    /* loading & modals */
-    .loading,.msg-error{padding:2.5rem 2rem;text-align:center;font-size:.83rem;color:var(--muted)}
-    .msg-error{color:var(--red)}
-    .spinner{display:inline-block;width:14px;height:14px;border:2px solid #B5D4F4;border-top-color:var(--accent);border-radius:50%;animation:spin .7s linear infinite;vertical-align:middle;margin-right:6px}
-    @keyframes spin{to{transform:rotate(360deg)}}
-    .modal-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.45);z-index:100;align-items:center;justify-content:center}
-    .modal-overlay.open{display:flex}
-    .modal-box{background:#fff;border-radius:8px;padding:1.5rem 2rem;max-width:340px;text-align:center;font-size:.82rem;box-shadow:0 4px 20px rgba(0,0,0,.2)}
-    .modal-box h4{font-size:.95rem;margin-bottom:.6rem;color:var(--red)}
-    .modal-box p{margin-bottom:1.1rem;color:var(--muted);font-size:.77rem}
-    .modal-btns{display:flex;gap:.6rem;justify-content:center}
+    /* Modal de Alertas y Notificaciones */
+    .modal-overlay {
+      display: none;
+      position: fixed;
+      inset: 0;
+      background: rgba(0, 0, 0, 0.5);
+      z-index: 1000;
+      align-items: center;
+      justify-content: center;
+    }
+    
+    .modal-overlay.active { display: flex; }
+    
+    .modal-card {
+      background: var(--card-bg);
+      width: 90%;
+      max-width: 500px;
+      border-radius: 8px;
+      padding: 24px;
+      box-shadow: 0 10px 25px rgba(0,0,0,0.2);
+      border-top: 5px solid var(--danger);
+    }
+    
+    .modal-card h3 {
+      color: var(--danger);
+      margin-bottom: 12px;
+      font-size: 1.2rem;
+    }
+    
+    .modal-card ul {
+      margin-top: 10px;
+      padding-left: 20px;
+      color: var(--text-muted);
+      font-size: 0.9rem;
+      max-height: 200px;
+      overflow-y: auto;
+    }
+    
+    .modal-card ul li { margin-bottom: 6px; }
+    
+    .modal-footer {
+      margin-top: 20px;
+      text-align: right;
+    }
+    
+    /* Pantalla de Carga */
+    .loader-container {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 60px 20px;
+      color: var(--text-muted);
+    }
+    
+    .spinner {
+      width: 40px;
+      height: 40px;
+      border: 4px solid #e2e8f0;
+      border-top-color: var(--primary);
+      border-radius: 50%;
+      animation: spin 0.8s linear infinite;
+      margin-bottom: 16px;
+    }
+    
+    @keyframes spin { to { transform: rotate(360deg); } }
+    
+    /* Selector Desplegable de Edición Rápida */
+    .shift-selector {
+      position: absolute;
+      display: none;
+      background: #fff;
+      border: 1px solid var(--border-color);
+      box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+      border-radius: 6px;
+      z-index: 100;
+      overflow: hidden;
+    }
+    
+    .shift-option {
+      padding: 8px 16px;
+      font-size: 0.85rem;
+      font-weight: 600;
+      cursor: pointer;
+      text-align: center;
+      border-bottom: 1px solid #f1f5f9;
+    }
+    
+    .shift-option:hover { background-color: #f8fafc; }
   </style>
 </head>
 <body>
 
-<header>
-  <h1>Cronograma</h1>
-  <span>gestión de personal</span>
-</header>
+  <header>
+    <h1>Gestión de Turnos <span id="sheet-title-display" style="font-size:1rem;color:var(--text-muted);font-weight:normal;"></span></h1>
+  </header>
 
-<div class="tabs-bar">
-  <button class="tab-btn active" onclick="switchTab('current',this)">Mes en curso</button>
-  <button class="tab-btn"        onclick="switchTab('next',this)">Mes entrante</button>
-</div>
+  <div class="toolbar">
+    <button class="btn btn-primary" id="btn-autofill" onclick="handleAutoFill()">
+      ✨ Completar Automáticamente
+    </button>
+    <button class="btn btn-success" id="btn-save" onclick="handleSaveChanges()">
+      💾 Guardar Cambios
+    </button>
+    <button class="btn btn-danger" id="btn-clear" onclick="handleClearSchedule()">
+      🗑 Vaciar Cronograma
+    </button>
+  </div>
 
-<div id="tab-current" class="tab-content active"></div>
-<div id="tab-next"    class="tab-content"></div>
-
-<div class="modal-overlay" id="confirm-modal">
-  <div class="modal-box">
-    <h4>⚠ Vaciar cronograma</h4>
-    <p>Esto va a borrar todos los turnos asignados.<br>Los nombres y la cabecera se mantienen.<br><br>¿Confirmás?</p>
-    <div class="modal-btns">
-      <button class="btn btn-red"  id="modal-confirm">Sí, vaciar</button>
-      <button class="btn btn-blue" onclick="closeModal()">Cancelar</button>
+  <div id="calendar-wrapper">
+    <div class="loader-container">
+      <div class="spinner"></div>
+      <p>Cargando estructura y configuraciones desde Google Sheets...</p>
     </div>
   </div>
-</div>
 
-<script>
-const API="https://script.google.com/macros/s/AKfycbzP-qBzVytXwMXTU67z8i4MFUYENUvtVOgoBicXOv-b1-zGi4QgvoKj9gdu_jHJZEhg/exec";
-const MESES=["ENERO","FEBRERO","MARZO","ABRIL","MAYO","JUNIO","JULIO","AGOSTO","SEPTIEMBRE","OCTUBRE","NOVIEMBRE","DICIEMBRE"];
-const DIAS=["D","L","MA","MI","J","V","S"];
-const ALL_TURNS=["M","T","N","F","RM","RT","-"];
-// Nuevos Roles Funcionales
-const PRIORITIES=["Rotativo", "Soporte Fijo", "Ancla Nocturna", "Comodín"];
-
-const calState={current:null,next:null};
-const cfgState={current:[],next:[]};
-const loaded={};
-let cbN=0, pendingClearTab=null;
-
-function jsonp(params,cb){
-  const name="__cb"+(++cbN);
-  const qs=Object.entries(params).map(([k,v])=>k+"="+encodeURIComponent(v)).join("&");
-  const to=setTimeout(()=>{cb({error:"Timeout"});delete window[name];},25000);
-  window[name]=d=>{clearTimeout(to);delete window[name];cb(d);};
-  const s=document.createElement("script");
-  s.src=API+"?"+qs+"&callback="+name;
-  s.onerror=()=>{clearTimeout(to);cb({error:"Error de red"});delete window[name];};
-  document.head.appendChild(s);
-}
-
-function switchTab(tab,btn){
-  document.querySelectorAll(".tab-btn").forEach(b=>b.classList.remove("active"));
-  document.querySelectorAll(".tab-content").forEach(c=>c.classList.remove("active"));
-  btn.classList.add("active");
-  document.getElementById("tab-"+tab).classList.add("active");
-  if(!loaded[tab]) loadTab(tab);
-}
-function setHtml(tab,html){document.getElementById("tab-"+tab).innerHTML=html;}
-
-function loadTab(tab){
-  loaded[tab]=true;
-  setHtml(tab,'<div class="loading"><span class="spinner"></span>Cargando...</div>');
-  let calDone=false,cfgDone=false;
-  jsonp({action:"read",tab},json=>{
-    if(!json.error) calState[tab]=json.data;
-    calDone=true; if(cfgDone) render(tab);
-  });
-  jsonp({action:"readConfig",tab},json=>{
-    if(!json.error&&json.config) cfgState[tab]=json.config;
-    cfgDone=true; if(calDone) render(tab);
-  });
-}
-
-function render(tab){
-  const now=new Date();
-  const defM=tab==="next"?(now.getMonth()+1)%12:now.getMonth();
-  const defY=tab==="next"&&now.getMonth()===11?now.getFullYear()+1:now.getFullYear();
-
-  let html=`
-  <div class="toolbar">
-    <label>Mes:</label>
-    <select id="sel-m-${tab}">${MESES.map((m,i)=>`<option value="${i}"${i===defM?" selected":""}>${m}</option>`).join("")}</select>
-    <label>Año:</label>
-    <input type="number" id="sel-y-${tab}" value="${defY}" min="2020" max="2099" style="width:66px">
-    <button class="btn btn-blue"   onclick="doInitMonth('${tab}')">⚙ Generar mes</button>
-    <button class="btn btn-purple" onclick="doAutoFill('${tab}')">🔀 Distribuir turnos</button>
-    <button class="btn btn-green"  onclick="doSave('${tab}')">💾 Guardar cambios</button>
-    <button class="btn btn-red"    onclick="askClear('${tab}')">🗑 Vaciar cronograma</button>
-    <span id="status-${tab}"></span>
+  <div class="shift-selector" id="quick-selector">
+    <div class="shift-option" onclick="applySelectedShift('M')">M - Mañana</div>
+    <div class="shift-option" onclick="applySelectedShift('T')">T - Tarde</div>
+    <div class="shift-option" onclick="applySelectedShift('N')">N - Noche</div>
+    <div class="shift-option" onclick="applySelectedShift('F')">F - Franco</div>
+    <div class="shift-option" onclick="applySelectedShift('RM')">RM - Ref. Mañana</div>
+    <div class="shift-option" onclick="applySelectedShift('RT')">RT - Ref. Tarde</div>
+    <div class="shift-option" onclick="applySelectedShift('-')">- No Disponible</div>
+    <div class="shift-option" onclick="applySelectedShift('')" style="color:var(--danger)">[Borrar]</div>
   </div>
-  <div class="cover-bar">
-    <strong>Cobertura/día:</strong>
-    <label>M:<input type="number" id="cov-M-${tab}"  value="3" min="1" max="20"></label>
-    <label>T:<input type="number" id="cov-T-${tab}"  value="3" min="1" max="20"></label>
-    <label>N:<input type="number" id="cov-N-${tab}"  value="2" min="1" max="20"></label>
-    <label>RM:<input type="number" id="cov-RM-${tab}" value="1" min="0" max="10"></label>
-    <label>RT:<input type="number" id="cov-RT-${tab}" value="1" min="0" max="10"></label>
-  </div>`;
 
-  html+=`<div class="legend">
-    <span class="leg leg-F">F — Franco</span>
-    <span class="leg leg-N">N — Noche</span>
-    <span class="leg">M — Mañana</span>
-    <span class="leg">T — Tarde</span>
-    <span class="leg">RM — Ref. Mañana</span>
-    <span class="leg">RT — Ref. Tarde</span>
-    <span class="leg">— — No disponible</span>
-  </div>`;
+  <div class="modal-overlay" id="alert-modal">
+    <div class="modal-card">
+      <h3>⚠ Alertas de Cobertura</h3>
+      <p style="font-size:0.9rem;color:var(--text-main)">El motor inteligente detectó los siguientes conflictos o faltas de personal para cumplir con las reglas en armonía:</p>
+      <ul id="alert-list"></ul>
+      <div class="modal-footer">
+        <button class="btn btn-primary" onclick="closeAlertModal()">Entendido</button>
+      </div>
+    </div>
+  </div>
 
-  html+=buildTable(tab,calState[tab]);
-  html+=buildCfgPanel(tab);
-  document.getElementById("tab-"+tab).innerHTML=html;
-}
+  <script>
+    // Variables de Estado Global del Cliente
+    let currentCalendarData = [];
+    let currentHeaderData = [];
+    let workerConfigsMap = {};
+    let activeEditCell = null;
+    const VALID_SHIFTS = ["M", "T", "N", "F", "RT", "RM", "-"];
 
-function buildTable(tab,rows){
-  if(!rows||rows.length===0) return '<div class="msg-error">Sin datos. Usá "Generar mes" para inicializar.</div>';
-  const header=rows[0];
-  const monthYear=String(header[0]||"").trim();
-  let numDays=0;
-  for(let c=1;c<header.length;c++){if(String(header[c]||"").trim()==="")break;numDays++;}
-
-  let t=`<div class="table-wrapper"><table><thead><tr>`;
-  t+=`<th contenteditable="true" data-tab="${tab}" data-r="0" data-c="0" onblur="cellEdit(this)">${esc(monthYear)}</th>`;
-  for(let c=1;c<=numDays;c++){
-    const raw=String(header[c]||"").trim();
-    const parts=raw.split(/\n|\r/);
-    t+=`<th contenteditable="true" data-tab="${tab}" data-r="0" data-c="${c}" onblur="cellEdit(this)">
-      <div class="day-header">
-        <span class="day-num">${esc(parts[0]||"")}</span>
-        ${parts[1]?`<span class="day-letter">${esc(parts[1])}</span>`:""}
-      </div></th>`;
-  }
-  t+=`</tr></thead><tbody>`;
-
-  for(let r=1;r<rows.length;r++){
-    const name=String(rows[r][0]||"").trim();
-    if(name===""&&rows[r].slice(1).every(v=>String(v).trim()==="")) continue;
-    t+=`<tr>`;
-    t+=`<td contenteditable="true" data-tab="${tab}" data-r="${r}" data-c="0" onblur="cellEdit(this)">${esc(name)}</td>`;
-    for(let c=1;c<=numDays;c++){
-      const val=String(rows[r][c]!==undefined?rows[r][c]:"").trim().toUpperCase();
-      t+=`<td contenteditable="true" class="${cellCls(val)}" data-tab="${tab}" data-r="${r}" data-c="${c}" onblur="cellEditTurn(this)">${esc(val)}</td>`;
-    }
-    t+=`</tr>`;
-  }
-  t+=`<tr class="add-row-row"><td colspan="${numDays+1}">
-    <button class="btn-add-row" onclick="addEmployee('${tab}')">+ Agregar empleado</button>
-  </td></tr>`;
-  t+=`</tbody></table></div>`;
-  return t;
-}
-
-function cellCls(v){
-  if(v==="F") return "cell-F";
-  if(v==="N") return "cell-N";
-  return "";
-}
-
-function buildCfgPanel(tab){
-  const names=getNames(tab);
-  const cfgMap={};
-  
-  // Migración automática si en Google Sheets tienen guardados los roles viejos
-  (cfgState[tab]||[]).forEach(c=>{
-    let prio = c.priority || "Rotativo";
-    if(prio === "Titular") prio = "Rotativo";
-    if(prio === "Suplente 1") prio = "Soporte Fijo";
-    if(prio === "Suplente 2") prio = "Comodín";
-    c.priority = prio;
-    cfgMap[c.name]=c;
-  });
-
-  const priorityOrder={"Rotativo":0,"Soporte Fijo":1,"Ancla Nocturna":2,"Comodín":3};
-  const sorted=[...names].sort((a,b)=>{
-    const pa=priorityOrder[(cfgMap[a]||{}).priority]??99;
-    const pb=priorityOrder[(cfgMap[b]||{}).priority]??99;
-    return pa-pb;
-  });
-
-  let html=`<div class="cfg-panel">
-  <h3>⚙ Configuración de Roles y Empleados</h3>
-  <div style="overflow-x:auto">
-  <table class="cfg-table">
-    <thead><tr>
-      <th>Empleado</th>
-      <th>Disponibilidad</th>
-      <th>Rol Funcional</th>
-      <th>Turnos disponibles</th>
-    </tr></thead><tbody id="cfg-body-${tab}">`;
-
-  sorted.forEach(name=>{
-    const c=cfgMap[name]||{name,availability:"Disponible",partialDays:"",priority:"Rotativo",turnTypes:""};
-    
-    let pClass = "row-rotativo";
-    if(c.priority === "Soporte Fijo") pClass = "row-fijo";
-    if(c.priority === "Ancla Nocturna") pClass = "row-ancla";
-    if(c.priority === "Comodín") pClass = "row-comodin";
-
-    const selTurns=(c.turnTypes||"").split(",").map(s=>s.trim()).filter(Boolean);
-    const showPartial=c.availability==="Disponibilidad parcial"?"block":"none";
-
-    const availSel=["Disponible","Disponibilidad parcial","No disponible"].map(o=>
-      `<option${o===c.availability?" selected":""}>${o}</option>`).join("");
-    const prioSel=PRIORITIES.map(o=>
-      `<option${o===c.priority?" selected":""}>${o}</option>`).join("");
-    const turnChks=ALL_TURNS.map(t=>
-      `<label><input type="checkbox" class="chk-turn" data-name="${esc(name)}" data-tab="${tab}" value="${t}"${selTurns.includes(t)?" checked":""}>${t}</label>`
-    ).join("");
-
-    html+=`<tr class="${pClass}" data-name="${esc(name)}">
-      <td>${esc(name)}</td>
-      <td>
-        <select class="cfg-avail" data-name="${esc(name)}" data-tab="${tab}" onchange="togglePartial(this)">
-          ${availSel}
-        </select>
-        <div class="partial-days" id="partial-${tab}-${esc(name).replace(/\s/g,'_')}" style="display:${showPartial}">
-          <input type="text" class="cfg-partial" data-name="${esc(name)}" data-tab="${tab}" value="${esc(c.partialDays)}" placeholder="ej: 5,12,20">
-        </div>
-      </td>
-      <td>
-        <select class="cfg-prio" data-name="${esc(name)}" data-tab="${tab}" onchange="updateRowClass(this)">
-          ${prioSel}
-        </select>
-      </td>
-      <td><div class="turn-checks">${turnChks}</div></td>
-    </tr>`;
-  });
-
-  html+=`</tbody></table></div>
-  <div style="margin-top:.6rem;display:flex;gap:.5rem;align-items:center">
-    <button class="btn btn-green" onclick="saveCfg('${tab}')">💾 Guardar configuración</button>
-    <span id="cfg-status-${tab}"></span>
-  </div></div>`;
-  return html;
-}
-
-function togglePartial(sel){
-  const name=sel.dataset.name, tab=sel.dataset.tab;
-  const id="partial-"+tab+"-"+name.replace(/\s/g,"_");
-  const div=document.getElementById(id);
-  if(div) div.style.display=sel.value==="Disponibilidad parcial"?"block":"none";
-}
-
-function updateRowClass(sel){
-  const tr=sel.closest("tr");
-  if(!tr) return;
-  tr.classList.remove("row-rotativo","row-fijo","row-ancla","row-comodin");
-  if(sel.value==="Rotativo") tr.classList.add("row-rotativo");
-  else if(sel.value==="Soporte Fijo") tr.classList.add("row-fijo");
-  else if(sel.value==="Ancla Nocturna") tr.classList.add("row-ancla");
-  else tr.classList.add("row-comodin");
-}
-
-function cellEdit(el){
-  const tab=el.dataset.tab,r=parseInt(el.dataset.r),c=parseInt(el.dataset.c);
-  ensureCell(tab,r,c);
-  calState[tab][r][c]=el.innerText.trim();
-}
-function cellEditTurn(el){
-  const tab=el.dataset.tab,r=parseInt(el.dataset.r),c=parseInt(el.dataset.c);
-  const val=el.innerText.trim().toUpperCase();
-  ensureCell(tab,r,c);
-  calState[tab][r][c]=val;
-  el.className=cellCls(val);
-}
-function ensureCell(tab,r,c){
-  if(!calState[tab]) calState[tab]=[];
-  while(calState[tab].length<=r) calState[tab].push([]);
-  while(calState[tab][r].length<=c) calState[tab][r].push("");
-}
-function addEmployee(tab){
-  if(!calState[tab]||!calState[tab].length) return;
-  const cols=calState[tab][0].length;
-  const row=new Array(cols).fill(""); row[0]="Nuevo empleado";
-  calState[tab].push(row);
-  render(tab);
-  const tds=document.querySelectorAll(`#tab-${tab} tbody tr:not(.add-row-row):last-child td`);
-  if(tds[0]){tds[0].focus();selAll(tds[0]);}
-}
-
-function doInitMonth(tab){
-  const month=parseInt(document.getElementById("sel-m-"+tab).value);
-  const year =parseInt(document.getElementById("sel-y-"+tab).value);
-  setStatus(tab,"⏳ Generando...","");
-  jsonp({action:"initMonth",tab,month,year},json=>{
-    if(json.error){setStatus(tab,"✗ "+json.error,"badge-err");return;}
-    calState[tab]=json.data;
-    render(tab);
-    setStatus(tab,"✓ Mes generado","badge-ok");
-  });
-}
-
-function askClear(tab){
-  pendingClearTab=tab;
-  document.getElementById("confirm-modal").classList.add("open");
-  document.getElementById("modal-confirm").onclick=()=>{
-    closeModal();
-    doClear(pendingClearTab);
-  };
-}
-function closeModal(){document.getElementById("confirm-modal").classList.remove("open");}
-function doClear(tab){
-  setStatus(tab,"⏳ Vaciando...","");
-  jsonp({action:"clearShifts",tab},json=>{
-    if(json.error){setStatus(tab,"✗ "+json.error,"badge-err");return;}
-    calState[tab]=json.data;
-    render(tab);
-    setStatus(tab,"✓ Cronograma vaciado","badge-ok");
-  });
-}
-
-/* ── MOTOR INTELIGENTE DE DISTRIBUCIÓN ── */
-function doAutoFill(tab){
-  syncTable(tab);
-  if(!calState[tab]||calState[tab].length<2){setStatus(tab,"Sin datos","badge-err");return;}
-
-  const covM =parseInt(document.getElementById("cov-M-"+tab).value)||3;
-  const covT =parseInt(document.getElementById("cov-T-"+tab).value)||3;
-  const covN =parseInt(document.getElementById("cov-N-"+tab).value)||2;
-  const covRM=parseInt(document.getElementById("cov-RM-"+tab).value)||1;
-  const covRT=parseInt(document.getElementById("cov-RT-"+tab).value)||1;
-  const FRANCO_MAX_DAY = 6;
-
-  const cfgMap={};
-  readCfgFromDOM(tab).forEach(c=>{cfgMap[c.name]=c;});
-
-  const header=calState[tab][0];
-  let numDays=0;
-  for(let c=1;c<header.length;c++){if(String(header[c]||"").trim()==="")break;numDays++;}
-
-  const dayDOW=[];
-  for(let c=1;c<=numDays;c++){
-    const raw=String(header[c]||"").trim();
-    dayDOW.push((raw.split(/\n|\r/)[1]||"").trim());
-  }
-
-  const weekMap=[];
-  let wIdx=0; weekMap.push([]);
-  for(let d=0;d<numDays;d++){
-    if(d>0&&dayDOW[d]==="L"){wIdx++;weekMap.push([]);}
-    weekMap[wIdx].push(d);
-  }
-
-  const empRows=[];
-  for(let r=1;r<calState[tab].length;r++){
-    const name=String(calState[tab][r][0]||"").trim();
-    if(!name) continue;
-    let prio = cfgMap[name]?.priority || "Rotativo";
-    if(prio === "Titular") prio = "Rotativo";
-    if(prio === "Suplente 1") prio = "Soporte Fijo";
-    if(prio === "Suplente 2") prio = "Comodín";
-
-    const cfg=cfgMap[name]||{availability:"Disponible",priority:prio,turnTypes:"",partialDays:""};
-    if(cfg.availability==="No disponible") continue;
-    empRows.push({r,name,cfg});
-  }
-
-  // Separación por Roles
-  const rotativos = empRows.filter(e=>e.cfg.priority==="Rotativo");
-  const fijos     = empRows.filter(e=>e.cfg.priority==="Soporte Fijo");
-  const anclas    = empRows.filter(e=>e.cfg.priority==="Ancla Nocturna");
-  const comodines = empRows.filter(e=>e.cfg.priority==="Comodín");
-
-  const allEmp =[...rotativos,...fijos,...anclas,...comodines];
-  const shifts={}, locked={};
-  
-  allEmp.forEach(({r,name,cfg})=>{
-    const row=[], lck=[];
-    for(let c=1;c<=numDays;c++){
-      const v=String(calState[tab][r][c]||"").trim().toUpperCase();
-      row.push(v); lck.push(v!==""); // Bloqueamos edición manual
-    }
-    if(cfg.availability==="Disponibilidad parcial"){
-      (cfg.partialDays||"").split(",").forEach(s=>{
-        const d=parseInt(s.trim())-1;
-        if(!isNaN(d)&&d>=0&&d<numDays&&!lck[d]){row[d]="-";lck[d]=true;}
+    // Inicialización al Cargar el DOM
+    document.addEventListener("DOMContentLoaded", () => {
+      loadInitialData();
+      
+      // Ocultar selector rápido al hacer clic fuera
+      document.addEventListener("click", (e) => {
+        const selector = document.getElementById("quick-selector");
+        if (!selector.contains(e.target) && !e.target.classList.contains("cell-shift")) {
+          selector.style.display = "none";
+        }
       });
-    }
-    shifts[name]=row; locked[name]=lck;
-  });
-
-  function countDay(d,type){ return allEmp.filter(e=>shifts[e.name][d]===type).length; }
-  function assign(name,d,type){ shifts[name][d]=type; locked[name][d]=true; }
-  function isFree(name,d){ return !locked[name][d]; }
-  function canDo(cfg,type){
-    if(!cfg.turnTypes||cfg.turnTypes.trim()==="") return true;
-    return cfg.turnTypes.split(",").map(s=>s.trim()).includes(type);
-  }
-
-  // PASO 0: Protección de turnos N manuales (Asegurar F-F)
-  allEmp.forEach(e => {
-    for (let d = 0; d < numDays; d++) {
-      if (shifts[e.name][d] === "N") {
-        if (d + 1 >= numDays || shifts[e.name][d + 1] !== "N") {
-          if (d + 1 < numDays && isFree(e.name, d + 1)) assign(e.name, d + 1, "F");
-          if (d + 2 < numDays && isFree(e.name, d + 2)) assign(e.name, d + 2, "F");
-        }
-      }
-    }
-  });
-
-  // PASO 1: Soporte Fijo
-  fijos.forEach(e => {
-    for(let d=0; d<numDays; d++){
-      if(!isFree(e.name, d)) continue;
-      const isWeekend = (dayDOW[d] === "S" || dayDOW[d] === "D");
-      if(isWeekend) {
-         assign(e.name, d, "F");
-      } else {
-         const pref = ["RM", "RT", "M", "T"].find(t => canDo(e.cfg, t));
-         if(pref) assign(e.name, d, pref);
-      }
-    }
-  });
-
-  // PASO 2: Anclas Nocturnas
-  anclas.forEach(e => {
-    for(let d=0; d<numDays; d++){
-      if(!isFree(e.name, d)) continue;
-      let prev = d > 0 ? shifts[e.name][d-1] : null;
-      let prev2 = d > 1 ? shifts[e.name][d-2] : null;
-
-      if(prev === "N" && prev2 !== "N") assign(e.name, d, "N");
-      else if(prev === "N" && prev2 === "N") assign(e.name, d, "F");
-      else if(prev === "F" && prev2 === "N") assign(e.name, d, "F");
-      else {
-         if(countDay(d, "N") < covN && canDo(e.cfg, "N")) assign(e.name, d, "N");
-         else assign(e.name, d, "F");
-      }
-    }
-  });
-
-  // PASO 3: Rotativos
-  // 3A: Garantizar 1 fin de semana libre por empleado
-  rotativos.forEach((e, i) => {
-    let weekOffset = i % weekMap.length;
-    for(let w=0; w<weekMap.length; w++) {
-       let targetWeek = (w + weekOffset) % weekMap.length;
-       let wDays = weekMap[targetWeek];
-       let sat = wDays.find(d => dayDOW[d] === "S");
-       let sun = wDays.find(d => dayDOW[d] === "D");
-       if(sat !== undefined && sun !== undefined && isFree(e.name, sat) && isFree(e.name, sun)) {
-           assign(e.name, sat, "F");
-           assign(e.name, sun, "F");
-           break;
-       }
-    }
-  });
-
- // 3B: Máquina de estados (M -> F -> T -> F -> N) y bloques de 3-5 días
-  const rotPhaseOrder = ["M", "T", "N"];
-  rotativos.forEach((e, i) => {
-    let currentPhase = rotPhaseOrder[i % 3]; // Offset para que no todos empiecen en el mismo turno
-    let streak = 0;
-
-    for(let d=0; d<numDays; d++) {
-        let v = shifts[e.name][d];
-        if(v !== "") {
-            if(v === "M" || v === "T" || v === "N") { currentPhase = v; streak++; } 
-            else if(v === "F") streak = 0;
-            continue; // Evita pisar la entrada manual, pero actualiza el streak
-        }
-
-        let prev = d > 0 ? shifts[e.name][d-1] : null;
-        if(prev === "M" || prev === "T") {
-            if(streak < 3) { assign(e.name, d, prev); streak++; } 
-            else if (streak >= 5) { assign(e.name, d, "F"); streak = 0; } 
-            else {
-                let need = prev === "M" ? (covM - countDay(d, "M")) : (covT - countDay(d, "T"));
-                if(need > 0) { assign(e.name, d, prev); streak++; }
-                else { assign(e.name, d, "F"); streak = 0; }
-            }
-        } else if(prev === "N") {
-            if(streak < 2) { assign(e.name, d, "N"); streak++; }
-            else { assign(e.name, d, "F"); streak = 0; }
-        } else {
-            // Transición a la siguiente fase
-            let nextPhase = "M";
-            if(currentPhase === "M") nextPhase = "T";
-            else if(currentPhase === "T") nextPhase = "N";
-            else if(currentPhase === "N") nextPhase = "M";
-
-            if(canDo(e.cfg, nextPhase)) {
-               assign(e.name, d, nextPhase);
-               currentPhase = nextPhase;
-               streak = 1;
-            } else {
-               assign(e.name, d, "F"); 
-            }
-        }
-    }
-  });
-
-  // PASO 4: Comodines y Parche Final
-  for(let d=0; d<numDays; d++){
-    ["RM","RT","M","T","N"].forEach(turn => {
-      let need = 0;
-      if(turn==="RM") need = covRM - countDay(d,"RM");
-      if(turn==="RT") need = covRT - countDay(d,"RT");
-      if(turn==="M")  need = covM - countDay(d,"M");
-      if(turn==="T")  need = covT - countDay(d,"T");
-      if(turn==="N")  need = covN - countDay(d,"N");
-
-      if(need > 0) {
-        let pool = comodines.filter(e=>isFree(e.name,d) && canDo(e.cfg, turn));
-        pool.sort(()=>Math.random()-.5);
-        pool.slice(0, need).forEach(e=>assign(e.name,d,turn));
-      }
     });
-  }
 
-  // Dejar libre lo que los comodines no cubran
-  comodines.forEach(e => {
-    for(let d=0;d<numDays;d++) if(isFree(e.name,d)) assign(e.name,d,"-");
-  });
+    /**
+     * Solicita al backend la lectura de datos para inicializar la vista.
+     */
+    function loadInitialData() {
+      toggleButtonsState(true);
+      google.script.run
+        .withSuccessHandler(onDataLoaded)
+        .withFailureHandler(onServerFailure)
+        .getSpreadsheetData();
+    }
 
-  // ── ESCRITURA ──
-  allEmp.forEach(({r,name})=>{
-    for(let c=1;c<=numDays;c++) calState[tab][r][c]=shifts[name][c-1];
-  });
+    /**
+     * Callback exitoso de carga de datos. Renderiza la tabla de turnos.
+     */
+    function onDataLoaded(response) {
+      currentHeaderData = response.header;
+      currentCalendarData = response.calendar;
+      workerConfigsMap = response.configs;
+      
+      const titleEl = document.getElementById("sheet-title-display");
+      if (titleEl) titleEl.innerText = `| ${response.sheetName}`;
+      
+      renderCalendarGrid();
+      toggleButtonsState(false);
+    }
 
-  render(tab);
-  setStatus(tab,"✓ Turnos distribuidos (Inteligente)","badge-ok");
-}
+    /**
+     * Dibuja la matriz principal aplicando las clases y conteos dinámicos.
+     */
+    function renderCalendarGrid() {
+      const wrapper = document.getElementById("calendar-wrapper");
+      if (!currentCalendarData || currentCalendarData.length === 0) {
+        wrapper.innerHTML = `<div class="loader-container"><p style="color:var(--danger)">No se encontraron trabajadores en el calendario.</p></div>`;
+        return;
+      }
 
-function doSave(tab){
-  syncTable(tab);
-  if(!calState[tab]){setStatus(tab,"Sin datos","badge-err");return;}
-  setStatus(tab,"⏳ Guardando...","");
-  const payload=encodeURIComponent(JSON.stringify(calState[tab]));
-  jsonp({action:"save",tab,payload},json=>{
-    if(json.error){setStatus(tab,"✗ "+json.error,"badge-err");return;}
-    setStatus(tab,"✓ Guardado en Sheets","badge-ok");
-  });
-}
+      let html = `<div class="table-container"><table><thead><tr>`;
+      
+      // Dibujar Cabecera de Fechas
+      currentHeaderData.forEach((colText) => {
+        html += `<th>${escapeHtml(colText)}</th>`;
+      });
+      html += `</tr></thead><tbody>`;
 
-function readCfgFromDOM(tab){
-  const result=[];
-  getNames(tab).forEach(name=>{
-    const avail=document.querySelector(`.cfg-avail[data-name="${name}"][data-tab="${tab}"]`)?.value||"Disponible";
-    const partial=document.querySelector(`.cfg-partial[data-name="${name}"][data-tab="${tab}"]`)?.value||"";
-    const prio=document.querySelector(`.cfg-prio[data-name="${name}"][data-tab="${tab}"]`)?.value||"Rotativo";
-    const chks=[...document.querySelectorAll(`.chk-turn[data-name="${name}"][data-tab="${tab}"]:checked`)].map(c=>c.value);
-    result.push({name,availability:avail,partialDays:partial,priority:prio,turnTypes:chks.join(",")});
-  });
-  return result;
-}
+      // Dibujar Filas de Trabajadores
+      currentCalendarData.forEach((row, rIdx) => {
+        const workerName = row[0].trim();
+        const cfg = workerConfigsMap[workerName] || { categoria: "Titular" };
+        
+        // Determinar clase de borde indicador de categoría
+        let catBadgeClass = "cat-badge-Titular";
+        const catUpper = cfg.categoria.toUpperCase();
+        if (catUpper.includes("REFUERZO")) catBadgeClass = "cat-badge-Refuerzo";
+        else if (catUpper.includes("NOCTURNO")) catBadgeClass = "cat-badge-Nocturno";
+        else if (catUpper.includes("COMOD")) catBadgeClass = "cat-badge-Comodin";
 
-function saveCfg(tab){
-  const cfg=readCfgFromDOM(tab);
-  cfgState[tab]=cfg;
-  const s=document.getElementById("cfg-status-"+tab);
-  if(s) s.innerHTML='<span class="badge">⏳ Guardando...</span>';
-  const payload=encodeURIComponent(JSON.stringify(cfg));
-  jsonp({action:"saveConfig",tab,payload},json=>{
-    if(!s) return;
-    s.innerHTML=json.error
-      ?`<span class="badge badge-err">✗ ${esc(json.error)}</span>`
-      :'<span class="badge badge-ok">✓ Guardado</span>';
-  });
-}
+        // Conteo dinámico de francos ("F") en la fila para aplicar la regla de excepción (>12)
+        const totalFrancos = row.slice(1).filter(val => String(val).trim().toUpperCase() === "F").length;
+        const applyOverride = totalFrancos > 12;
 
-function getNames(tab){
-  const names=[];
-  if(!calState[tab]) return names;
-  for(let r=1;r<calState[tab].length;r++){
-    const n=String(calState[tab][r][0]||"").trim();
-    if(n) names.push(n);
-  }
-  return names;
-}
-function syncTable(tab){
-  document.querySelectorAll(`#tab-${tab} [data-tab="${tab}"][data-r]`).forEach(el=>{
-    const r=parseInt(el.dataset.r),c=parseInt(el.dataset.c);
-    ensureCell(tab,r,c);
-    let v=el.innerText.trim();
-    if(r>0&&c>0) v=v.toUpperCase();
-    calState[tab][r][c]=v;
-  });
-}
-function setStatus(tab,msg,cls){
-  const el=document.getElementById("status-"+tab);
-  if(el) el.innerHTML=`<span class="badge ${cls}">${msg}</span>`;
-}
-function selAll(el){
-  const range=document.createRange();range.selectNodeContents(el);
-  const sel=window.getSelection();sel.removeAllRanges();sel.addRange(range);
-}
-function esc(s){
-  return String(s).replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/"/g,"&quot;");
-}
+        html += `<tr>`;
+        html += `<td class="${catBadgeClass}"><strong>${escapeHtml(workerName)}</strong></td>`;
 
-loadTab("current");
-</script>
+        // Columnas de Turnos
+        for (let c = 1; c < row.length; c++) {
+          const shiftVal = String(row[c]).trim().toUpperCase();
+          let styleClass = "shift-standard";
+          let displayVal = shiftVal;
+
+          if (shiftVal === "F") {
+            styleClass = applyOverride ? "shift-empty-override" : "shift-F";
+          } else if (shiftVal === "N") {
+            styleClass = "shift-N";
+          }
+
+          html += `<td class="cell-shift ${styleClass}" data-row="${rIdx}" data-col="${c}" onclick="openQuickSelector(event, ${rIdx}, ${c})">${escapeHtml(displayVal)}</td>`;
+        }
+        html += `</tr>`;
+      });
+
+      html += `</tbody></table></div>`;
+      wrapper.innerHTML = html;
+    }
+
+    /**
+     * Muestra el menú flotante para modificar rápidamente una celda.
+     */
+    function openQuickSelector(event, rIdx, cIdx) {
+      event.stopPropagation();
+      activeEditCell = { rIdx, cIdx };
+      
+      const selector = document.getElementById("quick-selector");
+      const rect = event.target.getBoundingClientRect();
+      
+      selector.style.display = "block";
+      selector.style.left = `${rect.left + window.scrollX}px`;
+      selector.style.top = `${rect.bottom + window.scrollY + 2}px`;
+    }
+
+    /**
+     * Aplica el turno seleccionado desde el menú flotante y actualiza la grilla.
+     */
+    function applySelectedShift(shiftValue) {
+      if (!activeEditCell) return;
+      const { rIdx, cIdx } = activeEditCell;
+      
+      currentCalendarData[rIdx][cIdx] = shiftValue;
+      document.getElementById("quick-selector").style.display = "none";
+      
+      // Re-renderizar para actualizar clases dinámicas y reglas de conteo visual
+      renderCalendarGrid();
+    }
+
+    /**
+     * Desencadena el motor de autocompletado inteligente en el backend.
+     */
+    function handleAutoFill() {
+      toggleLoader("Ejecutando motor inteligente de autocompletado...");
+      toggleButtonsState(true);
+      
+      google.script.run
+        .withSuccessHandler((response) => {
+          if (response.success) {
+            currentCalendarData = response.calendar;
+            renderCalendarGrid();
+            
+            // Si el backend arrojó alertas de cobertura, mostrarlas en el modal
+            if (response.alertas && response.alertas.length > 0) {
+              showAlertModal(response.alertas);
+            }
+          }
+          toggleButtonsState(false);
+        })
+        .withFailureHandler(onServerFailure)
+        .runIntelligentAutoFill();
+    }
+
+    /**
+     * Envía la matriz actual para ser persistida en Google Sheets.
+     */
+    function handleSaveChanges() {
+      const btn = document.getElementById("btn-save");
+      const originalText = btn.innerHTML;
+      btn.innerHTML = "⏳ Guardando...";
+      toggleButtonsState(true);
+
+      google.script.run
+        .withSuccessHandler((response) => {
+          btn.innerHTML = "✓ ¡Guardado!";
+          setTimeout(() => { btn.innerHTML = originalText; }, 2000);
+          toggleButtonsState(false);
+        })
+        .withFailureHandler(onServerFailure)
+        .saveCalendarData(currentCalendarData);
+    }
+
+    /**
+     * Limpia los turnos del calendario tras confirmación del usuario.
+     */
+    function handleClearSchedule() {
+      if (!confirm("¿Estás seguro de que deseas vaciar todos los turnos asignados? Se mantendrán los nombres y las fechas.")) {
+        return;
+      }
+      
+      toggleLoader("Vaciando cronograma principal...");
+      toggleButtonsState(true);
+
+      google.script.run
+        .withSuccessHandler((response) => {
+          if (response.success) {
+            currentCalendarData = response.calendar;
+            renderCalendarGrid();
+          }
+          toggleButtonsState(false);
+        })
+        .withFailureHandler(onServerFailure)
+        .clearCalendarShifts();
+    }
+
+    /**
+     * Muestra el modal de notificaciones con la lista de alertas.
+     */
+    function showAlertModal(alertas) {
+      const listEl = document.getElementById("alert-list");
+      listEl.innerHTML = alertas.map(msg => `<li>${escapeHtml(msg)}</li>`).join("");
+      document.getElementById("alert-modal").classList.add("active");
+    }
+
+    function closeAlertModal() {
+      document.getElementById("alert-modal").classList.remove("active");
+    }
+
+    /**
+     * Controladores Visuales Auxiliares
+     */
+    function toggleLoader(message) {
+      const wrapper = document.getElementById("calendar-wrapper");
+      wrapper.innerHTML = `<div class="loader-container"><div class="spinner"></div><p>${escapeHtml(message)}</p></div>`;
+    }
+
+    function toggleButtonsState(disabled) {
+      document.querySelectorAll(".toolbar .btn").forEach(btn => btn.disabled = disabled);
+    }
+
+    function onServerFailure(error) {
+      toggleButtonsState(false);
+      alert(`Error en el servidor: ${error.message || error}`);
+      renderCalendarGrid();
+    }
+
+    function escapeHtml(str) {
+      return String(str)
+        .replace(/&/g, "&amp;")
+        .replace(/</g, "&lt;")
+        .replace(/>/g, "&gt;")
+        .replace(/"/g, "&quot;")
+        .replace(/'/g, "&#039;");
+    }
+  </script>
 </body>
 </html>
