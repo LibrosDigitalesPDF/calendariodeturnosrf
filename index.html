@@ -1,571 +1,409 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-  <meta charset="UTF-8">
-  <title>Sistema de Gestión Inteligente de Turnos</title>
-  <style>
-    /* Estilos Globales y Variables */
-    :root {
-      --bg-color: #f4f6f9;
-      --card-bg: #ffffff;
-      --border-color: #cbd5e1;
-      --text-main: #1e293b;
-      --text-muted: #64748b;
-      --primary: #0284c7;
-      --primary-hover: #0369a1;
-      --success: #16a34a;
-      --success-hover: #15803d;
-      --danger: #dc2626;
-      --danger-hover: #b91c1c;
-      --warning-bg: #fef08a;
-      --warning-border: #facc15;
-      
-      /* Colores de Categoría de Trabajadores */
-      --cat-titular: #e0f2fe;
-      --cat-refuerzo: #fef3c7;
-      --cat-nocturno: #f3e8ff;
-      --cat-comodin: #e2e8f0;
-    }
-    
-    *, *::before, *::after {
-      box-sizing: border-box;
-      margin: 0;
-      padding: 0;
-    }
-    
-    body {
-      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-      background-color: var(--bg-color);
-      color: var(--text-main);
-      padding: 20px;
-      padding-bottom: 60px;
-    }
-    
-    header {
-      margin-bottom: 20px;
-      border-bottom: 2px solid var(--border-color);
-      padding-bottom: 10px;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-    }
-    
-    header h1 {
-      font-size: 1.6rem;
-      color: var(--primary);
-    }
-    
-    /* Barra de Herramientas (Botones) */
-    .toolbar {
-      display: flex;
-      gap: 12px;
-      margin-bottom: 20px;
-      flex-wrap: wrap;
-      background: var(--card-bg);
-      padding: 14px;
-      border-radius: 8px;
-      box-shadow: 0 1px 3px rgba(0,0,0,0.1);
-      border: 1px solid var(--border-color);
-    }
-    
-    .btn {
-      padding: 10px 18px;
-      font-size: 0.9rem;
-      font-weight: 600;
-      border: none;
-      border-radius: 6px;
-      cursor: pointer;
-      display: inline-flex;
-      align-items: center;
-      gap: 8px;
-      transition: all 0.2s ease;
-    }
-    
-    .btn-primary { background-color: var(--primary); color: #fff; }
-    .btn-primary:hover { background-color: var(--primary-hover); }
-    
-    .btn-success { background-color: var(--success); color: #fff; }
-    .btn-success:hover { background-color: var(--success-hover); }
-    
-    .btn-danger { background-color: var(--danger); color: #fff; }
-    .btn-danger:hover { background-color: var(--danger-hover); }
-    
-    .btn:disabled {
-      opacity: 0.6;
-      cursor: not-allowed;
-    }
-    
-    /* Contenedor de la Tabla */
-    .table-container {
-      overflow-x: auto;
-      background: var(--card-bg);
-      border-radius: 8px;
-      box-shadow: 0 2px 8px rgba(0,0,0,0.08);
-      border: 1px solid var(--border-color);
-      margin-bottom: 30px;
-    }
-    
-    table {
-      width: 100%;
-      border-collapse: collapse;
-      font-size: 0.85rem;
-      text-align: center;
-    }
-    
-    thead th {
-      background-color: #f8fafc;
-      color: var(--text-main);
-      padding: 10px 6px;
-      border-bottom: 2px solid var(--border-color);
-      border-right: 1px solid var(--border-color);
-      font-weight: 600;
-      white-space: pre-line;
-      min-width: 42px;
-      line-height: 1.2;
-    }
-    
-    thead th:first-child {
-      text-align: left;
-      padding-left: 16px;
-      min-width: 180px;
-      position: sticky;
-      left: 0;
-      z-index: 10;
-      background-color: #f8fafc;
-    }
-    
-    tbody td {
-      padding: 8px 4px;
-      border-bottom: 1px solid #e2e8f0;
-      border-right: 1px solid #e2e8f0;
-      font-weight: 600;
-      transition: background-color 0.1s;
-      height: 38px;
-    }
-    
-    tbody td:first-child {
-      text-align: left;
-      padding-left: 16px;
-      position: sticky;
-      left: 0;
-      background-color: #ffffff;
-      border-right: 2px solid var(--border-color);
-      z-index: 5;
-    }
-    
-    /* Reglas de Estilos Dinámicos de Celda */
-    .cell-shift {
-      cursor: pointer;
-      user-select: none;
-    }
-    
-    /* F: Fondo gris oscuro, texto blanco mayúscula */
-    .shift-F {
-      background-color: #334155 !important;
-      color: #ffffff !important;
-    }
-    
-    /* N: Fondo gris claro, texto negro mayúscula */
-    .shift-N {
-      background-color: #cbd5e1 !important;
-      color: #000000 !important;
-    }
-    
-    /* Resto de siglas: Fondo blanco, texto negro */
-    .shift-standard {
-      background-color: #ffffff;
-      color: #000000;
-    }
-    
-    /* Excepción F > 12: Celda visualmente vacía */
-    .shift-empty-override {
-      background-color: #ffffff !important;
-      color: transparent !important;
-    }
-    
-    /* Colores Indicadores de Categoría en la Columna de Nombres */
-    .cat-badge-Titular { border-left: 5px solid #0284c7; }
-    .cat-badge-Refuerzo { border-left: 5px solid #d97706; }
-    .cat-badge-Nocturno { border-left: 5px solid #9333ea; }
-    .cat-badge-Comodin { border-left: 5px solid #475569; }
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sistema de Gestión de Turnos Inteligente</title>
+    <style>
+        :root {
+            --primary: #2563eb;
+            --primary-hover: #1d4ed8;
+            --danger: #dc2626;
+            --danger-hover: #b91c1c;
+            --success: #16a34a;
+            --success-hover: #15803d;
+            --bg-page: #f8fafc;
+            --border-color: #cbd5e1;
+            
+            /* Categorías */
+            --cat-titular: #dbeafe;
+            --cat-titular-text: #1e40af;
+            --cat-refuerzo: #dcfce7;
+            --cat-refuerzo-text: #166534;
+            --cat-soporte: #f3e8ff;
+            --cat-soporte-text: #6b21a8;
+            --cat-comodin1: #ffedd5;
+            --cat-comodin1-text: #c2410c;
+            --cat-comodin2: #fef9c3;
+            --cat-comodin2-text: #854d0e;
 
-    /* Modal de Alertas y Notificaciones */
-    .modal-overlay {
-      display: none;
-      position: fixed;
-      inset: 0;
-      background: rgba(0, 0, 0, 0.5);
-      z-index: 1000;
-      align-items: center;
-      justify-content: center;
-    }
-    
-    .modal-overlay.active { display: flex; }
-    
-    .modal-card {
-      background: var(--card-bg);
-      width: 90%;
-      max-width: 500px;
-      border-radius: 8px;
-      padding: 24px;
-      box-shadow: 0 10px 25px rgba(0,0,0,0.2);
-      border-top: 5px solid var(--danger);
-    }
-    
-    .modal-card h3 {
-      color: var(--danger);
-      margin-bottom: 12px;
-      font-size: 1.2rem;
-    }
-    
-    .modal-card ul {
-      margin-top: 10px;
-      padding-left: 20px;
-      color: var(--text-muted);
-      font-size: 0.9rem;
-      max-height: 200px;
-      overflow-y: auto;
-    }
-    
-    .modal-card ul li { margin-bottom: 6px; }
-    
-    .modal-footer {
-      margin-top: 20px;
-      text-align: right;
-    }
-    
-    /* Pantalla de Carga */
-    .loader-container {
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      padding: 60px 20px;
-      color: var(--text-muted);
-    }
-    
-    .spinner {
-      width: 40px;
-      height: 40px;
-      border: 4px solid #e2e8f0;
-      border-top-color: var(--primary);
-      border-radius: 50%;
-      animation: spin 0.8s linear infinite;
-      margin-bottom: 16px;
-    }
-    
-    @keyframes spin { to { transform: rotate(360deg); } }
-    
-    /* Selector Desplegable de Edición Rápida */
-    .shift-selector {
-      position: absolute;
-      display: none;
-      background: #fff;
-      border: 1px solid var(--border-color);
-      box-shadow: 0 4px 12px rgba(0,0,0,0.15);
-      border-radius: 6px;
-      z-index: 100;
-      overflow: hidden;
-    }
-    
-    .shift-option {
-      padding: 8px 16px;
-      font-size: 0.85rem;
-      font-weight: 600;
-      cursor: pointer;
-      text-align: center;
-      border-bottom: 1px solid #f1f5f9;
-    }
-    
-    .shift-option:hover { background-color: #f8fafc; }
-  </style>
+            /* Turnos Visuales */
+            --cell-f-bg: #334155;
+            --cell-f-text: #ffffff;
+            --cell-n-bg: #e2e8f0;
+            --cell-n-text: #0f172a;
+        }
+
+        * { box-sizing: border-box; font-family: system-ui, -apple-system, sans-serif; }
+        body { margin: 0; padding: 20px; background-color: var(--bg-page); color: #334155; }
+        
+        header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 2px solid var(--border-color);
+            padding-bottom: 15px;
+            margin-bottom: 20px;
+        }
+        h1 { margin: 0; font-size: 1.5rem; color: #0f172a; }
+        
+        .controls { display: flex; gap: 10px; flex-wrap: wrap; }
+        button {
+            padding: 10px 16px;
+            font-size: 0.875rem;
+            font-weight: 600;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: background 0.2s;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+        .btn-primary { background-color: var(--primary); color: white; }
+        .btn-primary:hover { background-color: var(--primary-hover); }
+        .btn-success { background-color: var(--success); color: white; }
+        .btn-success:hover { background-color: var(--success-hover); }
+        .btn-danger { background-color: var(--danger); color: white; }
+        .btn-danger:hover { background-color: var(--danger-hover); }
+
+        /* Contenedor de grilla con scroll horizontal fijo */
+        .table-container {
+            overflow-x: auto;
+            background: white;
+            border-radius: 8px;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+            border: 1px solid var(--border-color);
+            margin-bottom: 30px;
+        }
+
+        table { border-collapse: collapse; width: 100%; min-width: 1200px; text-align: center; font-size: 0.85rem; }
+        th, td { border: 1px solid var(--border-color); padding: 4px; height: 40px; }
+        
+        /* Fijar primera columna (Nombres) */
+        th:first-child, td:first-child {
+            position: sticky;
+            left: 0;
+            background: white;
+            z-index: 2;
+            text-align: left;
+            padding-left: 12px;
+            font-weight: 600;
+            min-width: 180px;
+            box-shadow: 2px 0 4px rgba(0,0,0,0.05);
+        }
+        th { background-color: #f1f5f9; color: #0f172a; position: sticky; top: 0; z-index: 1; }
+        th:first-child { z-index: 3; }
+
+        /* Inputs interactivos dentro de celdas */
+        .cell-select {
+            width: 100%;
+            height: 100%;
+            border: none;
+            background: transparent;
+            text-align: center;
+            font-weight: bold;
+            font-size: 0.85rem;
+            cursor: pointer;
+            appearance: none;
+            outline: none;
+        }
+
+        /* Reglas de Renderizado Visual de Celdas */
+        .shift-F { background-color: var(--cell-f-bg) !important; color: var(--cell-f-text) !important; }
+        .shift-N { background-color: var(--cell-n-bg) !important; color: var(--cell-n-text) !important; }
+        .shift-empty { background-color: white !important; color: transparent !important; } /* Oculta F excedentes visualmente */
+
+        /* Panel de Configuración */
+        .section-title { font-size: 1.2rem; margin-bottom: 12px; color: #0f172a; border-bottom: 1px solid var(--border-color); padding-bottom: 6px; }
+        .config-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 15px;
+        }
+        .config-card {
+            background: white;
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            padding: 12px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+        .config-header { display: flex; justify-content: space-between; align-items: center; font-weight: bold; }
+        .badge { padding: 4px 8px; border-radius: 20px; font-size: 0.75rem; font-weight: 700; }
+        
+        .cat-Titular { background-color: var(--cat-titular); color: var(--cat-titular-text); }
+        .cat-Refuerzo { background-color: var(--cat-refuerzo); color: var(--cat-refuerzo-text); }
+        .cat-Soporte { background-color: var(--cat-soporte); color: var(--cat-soporte-text); }
+        .cat-Comodín1 { background-color: var(--cat-comodin1); color: var(--cat-comodin1-text); }
+        .cat-Comodín2 { background-color: var(--cat-comodin2); color: var(--cat-comodin2-text); }
+
+        .config-row { display: flex; justify-content: space-between; font-size: 0.8rem; }
+        .config-row span:first-child { color: #64748b; }
+
+        /* Loader Overlay */
+        #loader {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(255, 255, 255, 0.8);
+            display: flex; flex-direction: column; justify-content: center; align-items: center;
+            z-index: 1000; opacity: 0; pointer-events: none; transition: opacity 0.3s;
+        }
+        #loader.active { opacity: 1; pointer-events: auto; }
+        .spinner {
+            width: 40px; height: 40px; border: 4px solid #e2e8f0;
+            border-top-color: var(--primary); border-radius: 50%;
+            animation: spin 1s linear infinite; margin-bottom: 10px;
+        }
+        @keyframes spin { to { transform: rotate(360deg); } }
+
+        /* Modal de Alerta */
+        #modal {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0,0,0,0.5); display: flex; justify-content: center; align-items: center;
+            z-index: 1001; opacity: 0; pointer-events: none; transition: opacity 0.2s;
+        }
+        #modal.active { opacity: 1; pointer-events: auto; }
+        .modal-content {
+            background: white; width: 90%; max-width: 450px; border-radius: 8px;
+            padding: 20px; box-shadow: 0 10px 15px -3px rgba(0,0,0,0.1);
+        }
+        .modal-title { font-size: 1.2rem; color: var(--danger); font-weight: bold; margin-bottom: 10px; }
+        .modal-actions { text-align: right; margin-top: 20px; }
+    </style>
 </head>
 <body>
 
-  <header>
-    <h1>Gestión de Turnos <span id="sheet-title-display" style="font-size:1rem;color:var(--text-muted);font-weight:normal;"></span></h1>
-  </header>
+    <header>
+        <h1 id="month-title">Cargando Sistema...</h1>
+        <div class="controls">
+            <button class="btn-success" onclick="loadData()">🔄 Recargar Sheets</button>
+            <button class="btn-primary" onclick="triggerAutocomplete()">✨ Completar Automáticamente</button>
+            <button class="btn-danger" onclick="clearGrid()">🗑️ Vaciar Cronograma</button>
+            <button class="btn-success" onclick="saveData()">💾 Guardar Cambios</button>
+        </div>
+    </header>
 
-  <div class="toolbar">
-    <button class="btn btn-primary" id="btn-autofill" onclick="handleAutoFill()">
-      ✨ Completar Automáticamente
-    </button>
-    <button class="btn btn-success" id="btn-save" onclick="handleSaveChanges()">
-      💾 Guardar Cambios
-    </button>
-    <button class="btn btn-danger" id="btn-clear" onclick="handleClearSchedule()">
-      🗑 Vaciar Cronograma
-    </button>
-  </div>
-
-  <div id="calendar-wrapper">
-    <div class="loader-container">
-      <div class="spinner"></div>
-      <p>Cargando estructura y configuraciones desde Google Sheets...</p>
+    <div class="table-container">
+        <table id="calendar-table">
+            <thead><tr id="table-header"></tr></thead>
+            <tbody id="table-body"></tbody>
+        </table>
     </div>
-  </div>
 
-  <div class="shift-selector" id="quick-selector">
-    <div class="shift-option" onclick="applySelectedShift('M')">M - Mañana</div>
-    <div class="shift-option" onclick="applySelectedShift('T')">T - Tarde</div>
-    <div class="shift-option" onclick="applySelectedShift('N')">N - Noche</div>
-    <div class="shift-option" onclick="applySelectedShift('F')">F - Franco</div>
-    <div class="shift-option" onclick="applySelectedShift('RM')">RM - Ref. Mañana</div>
-    <div class="shift-option" onclick="applySelectedShift('RT')">RT - Ref. Tarde</div>
-    <div class="shift-option" onclick="applySelectedShift('-')">- No Disponible</div>
-    <div class="shift-option" onclick="applySelectedShift('')" style="color:var(--danger)">[Borrar]</div>
-  </div>
+    <div class="section-title">Panel de Configuración Activa</div>
+    <div class="config-grid" id="config-panel"></div>
 
-  <div class="modal-overlay" id="alert-modal">
-    <div class="modal-card">
-      <h3>⚠ Alertas de Cobertura</h3>
-      <p style="font-size:0.9rem;color:var(--text-main)">El motor inteligente detectó los siguientes conflictos o faltas de personal para cumplir con las reglas en armonía:</p>
-      <ul id="alert-list"></ul>
-      <div class="modal-footer">
-        <button class="btn btn-primary" onclick="closeAlertModal()">Entendido</button>
-      </div>
+    <div id="loader"><div class="spinner"></div><span id="loader-text">Sincronizando con Google Sheets...</span></div>
+    
+    <div id="modal">
+        <div class="modal-content">
+            <div class="modal-title">⚠️ Atención Requerida</div>
+            <div id="modal-body">No hay personal suficiente para cubrir los turnos objetivo bajo las reglas configuradas. Revisa la matriz generada.</div>
+            <div class="modal-actions"><button class="btn-primary" onclick="closeModal()">Entendido</button></div>
+        </div>
     </div>
-  </div>
 
-  <script>
-    // Variables de Estado Global del Cliente
-    let currentCalendarData = [];
-    let currentHeaderData = [];
-    let workerConfigsMap = {};
-    let activeEditCell = null;
-    const VALID_SHIFTS = ["M", "T", "N", "F", "RT", "RM", "-"];
+    <script>
+        // CONEXIÓN CRÍTICA CON EL BACKEND DE APPS SCRIPT
+        const GAS_WEB_APP_URL = "URL_AQUI"; 
 
-    // Inicialización al Cargar el DOM
-    document.addEventListener("DOMContentLoaded", () => {
-      loadInitialData();
-      
-      // Ocultar selector rápido al hacer clic fuera
-      document.addEventListener("click", (e) => {
-        const selector = document.getElementById("quick-selector");
-        if (!selector.contains(e.target) && !e.target.classList.contains("cell-shift")) {
-          selector.style.display = "none";
-        }
-      });
-    });
+        const SHIFTS = ["", "M", "T", "N", "RT", "RM", "F", "-"];
+        let appState = { monthName: "", days: [], workers: [], grid: [], config: [] };
 
-    /**
-     * Solicita al backend la lectura de datos para inicializar la vista.
-     */
-    function loadInitialData() {
-      toggleButtonsState(true);
-      google.script.run
-        .withSuccessHandler(onDataLoaded)
-        .withFailureHandler(onServerFailure)
-        .getSpreadsheetData();
-    }
+        window.onload = () => loadData();
 
-    /**
-     * Callback exitoso de carga de datos. Renderiza la tabla de turnos.
-     */
-    function onDataLoaded(response) {
-      currentHeaderData = response.header;
-      currentCalendarData = response.calendar;
-      workerConfigsMap = response.configs;
-      
-      const titleEl = document.getElementById("sheet-title-display");
-      if (titleEl) titleEl.innerText = `| ${response.sheetName}`;
-      
-      renderCalendarGrid();
-      toggleButtonsState(false);
-    }
+        /**
+         * Realiza la carga inicial mediante GET
+         */
+        async function loadData() {
+            showLoader("Obteniendo datos desde Google Sheets...");
+            try {
+                const response = await fetch(GAS_WEB_APP_URL, { redirect: "follow" });
+                const data = await response.json();
+                
+                if (data.status === "error") throw new Error(data.message);
+                
+                appState = {
+                    monthName: data.monthName || "Mes Actual",
+                    days: data.days,
+                    workers: data.workers,
+                    grid: data.grid,
+                    config: data.config
+                };
 
-    /**
-     * Dibuja la matriz principal aplicando las clases y conteos dinámicos.
-     */
-    function renderCalendarGrid() {
-      const wrapper = document.getElementById("calendar-wrapper");
-      if (!currentCalendarData || currentCalendarData.length === 0) {
-        wrapper.innerHTML = `<div class="loader-container"><p style="color:var(--danger)">No se encontraron trabajadores en el calendario.</p></div>`;
-        return;
-      }
-
-      let html = `<div class="table-container"><table><thead><tr>`;
-      
-      // Dibujar Cabecera de Fechas
-      currentHeaderData.forEach((colText) => {
-        html += `<th>${escapeHtml(colText)}</th>`;
-      });
-      html += `</tr></thead><tbody>`;
-
-      // Dibujar Filas de Trabajadores
-      currentCalendarData.forEach((row, rIdx) => {
-        const workerName = row[0].trim();
-        const cfg = workerConfigsMap[workerName] || { categoria: "Titular" };
-        
-        // Determinar clase de borde indicador de categoría
-        let catBadgeClass = "cat-badge-Titular";
-        const catUpper = cfg.categoria.toUpperCase();
-        if (catUpper.includes("REFUERZO")) catBadgeClass = "cat-badge-Refuerzo";
-        else if (catUpper.includes("NOCTURNO")) catBadgeClass = "cat-badge-Nocturno";
-        else if (catUpper.includes("COMOD")) catBadgeClass = "cat-badge-Comodin";
-
-        // Conteo dinámico de francos ("F") en la fila para aplicar la regla de excepción (>12)
-        const totalFrancos = row.slice(1).filter(val => String(val).trim().toUpperCase() === "F").length;
-        const applyOverride = totalFrancos > 12;
-
-        html += `<tr>`;
-        html += `<td class="${catBadgeClass}"><strong>${escapeHtml(workerName)}</strong></td>`;
-
-        // Columnas de Turnos
-        for (let c = 1; c < row.length; c++) {
-          const shiftVal = String(row[c]).trim().toUpperCase();
-          let styleClass = "shift-standard";
-          let displayVal = shiftVal;
-
-          if (shiftVal === "F") {
-            styleClass = applyOverride ? "shift-empty-override" : "shift-F";
-          } else if (shiftVal === "N") {
-            styleClass = "shift-N";
-          }
-
-          html += `<td class="cell-shift ${styleClass}" data-row="${rIdx}" data-col="${c}" onclick="openQuickSelector(event, ${rIdx}, ${c})">${escapeHtml(displayVal)}</td>`;
-        }
-        html += `</tr>`;
-      });
-
-      html += `</tbody></table></div>`;
-      wrapper.innerHTML = html;
-    }
-
-    /**
-     * Muestra el menú flotante para modificar rápidamente una celda.
-     */
-    function openQuickSelector(event, rIdx, cIdx) {
-      event.stopPropagation();
-      activeEditCell = { rIdx, cIdx };
-      
-      const selector = document.getElementById("quick-selector");
-      const rect = event.target.getBoundingClientRect();
-      
-      selector.style.display = "block";
-      selector.style.left = `${rect.left + window.scrollX}px`;
-      selector.style.top = `${rect.bottom + window.scrollY + 2}px`;
-    }
-
-    /**
-     * Aplica el turno seleccionado desde el menú flotante y actualiza la grilla.
-     */
-    function applySelectedShift(shiftValue) {
-      if (!activeEditCell) return;
-      const { rIdx, cIdx } = activeEditCell;
-      
-      currentCalendarData[rIdx][cIdx] = shiftValue;
-      document.getElementById("quick-selector").style.display = "none";
-      
-      // Re-renderizar para actualizar clases dinámicas y reglas de conteo visual
-      renderCalendarGrid();
-    }
-
-    /**
-     * Desencadena el motor de autocompletado inteligente en el backend.
-     */
-    function handleAutoFill() {
-      toggleLoader("Ejecutando motor inteligente de autocompletado...");
-      toggleButtonsState(true);
-      
-      google.script.run
-        .withSuccessHandler((response) => {
-          if (response.success) {
-            currentCalendarData = response.calendar;
-            renderCalendarGrid();
-            
-            // Si el backend arrojó alertas de cobertura, mostrarlas en el modal
-            if (response.alertas && response.alertas.length > 0) {
-              showAlertModal(response.alertas);
+                document.getElementById("month-title").innerText = `Gestión de Turnos - ${appState.monthName}`;
+                renderCalendar();
+                renderConfigPanel();
+            } catch (error) {
+                showAlert("Error al conectar con la hoja de cálculo: " + error.message);
+            } finally {
+                hideLoader();
             }
-          }
-          toggleButtonsState(false);
-        })
-        .withFailureHandler(onServerFailure)
-        .runIntelligentAutoFill();
-    }
+        }
 
-    /**
-     * Envía la matriz actual para ser persistida en Google Sheets.
-     */
-    function handleSaveChanges() {
-      const btn = document.getElementById("btn-save");
-      const originalText = btn.innerHTML;
-      btn.innerHTML = "⏳ Guardando...";
-      toggleButtonsState(true);
+        /**
+         * Dibuja la matriz del calendario inyectando selectores interactivos
+         */
+        function renderCalendar() {
+            const headerRow = document.getElementById("table-header");
+            const bodyContent = document.getElementById("table-body");
+            
+            // Renderizar Cabeceras
+            headerRow.innerHTML = "<th>Trabajador</th>" + appState.days.map(d => `<th>${d}</th>`).join("");
+            
+            // Pre-calcular Francos para manejar la excepción visual (> 12 F quedan vacíos)
+            const fCounts = appState.workers.map((_, wIdx) => 
+                appState.grid[wIdx].filter(s => s === "F").length
+            );
 
-      google.script.run
-        .withSuccessHandler((response) => {
-          btn.innerHTML = "✓ ¡Guardado!";
-          setTimeout(() => { btn.innerHTML = originalText; }, 2000);
-          toggleButtonsState(false);
-        })
-        .withFailureHandler(onServerFailure)
-        .saveCalendarData(currentCalendarData);
-    }
+            // Renderizar Filas de Trabajadores
+            bodyContent.innerHTML = appState.workers.map((worker, wIdx) => {
+                const cells = appState.days.map((_, dIdx) => {
+                    const val = appState.grid[wIdx][dIdx] || "";
+                    let visualClass = "";
+                    let displayVal = val;
+                    
+                    if (val === "F") {
+                        visualClass = fCounts[wIdx] > 12 ? "shift-empty" : "shift-F";
+                    } else if (val === "N") {
+                        visualClass = "shift-N";
+                    }
 
-    /**
-     * Limpia los turnos del calendario tras confirmación del usuario.
-     */
-    function handleClearSchedule() {
-      if (!confirm("¿Estás seguro de que deseas vaciar todos los turnos asignados? Se mantendrán los nombres y las fechas.")) {
-        return;
-      }
-      
-      toggleLoader("Vaciando cronograma principal...");
-      toggleButtonsState(true);
+                    // Selector para edición inline rápida
+                    const options = SHIFTS.map(s => `<option value="${s}" ${s === val ? "selected" : ""}>${s}</option>`).join("");
+                    return `<td class="${visualClass}"><select class="cell-select" onchange="updateCell(${wIdx}, ${dIdx}, this.value)">${options}</select></td>`;
+                }).join("");
 
-      google.script.run
-        .withSuccessHandler((response) => {
-          if (response.success) {
-            currentCalendarData = response.calendar;
-            renderCalendarGrid();
-          }
-          toggleButtonsState(false);
-        })
-        .withFailureHandler(onServerFailure)
-        .clearCalendarShifts();
-    }
+                return `<tr><td>${worker}</td>${cells}</tr>`;
+            }).join("");
+        }
 
-    /**
-     * Muestra el modal de notificaciones con la lista de alertas.
-     */
-    function showAlertModal(alertas) {
-      const listEl = document.getElementById("alert-list");
-      listEl.innerHTML = alertas.map(msg => `<li>${escapeHtml(msg)}</li>`).join("");
-      document.getElementById("alert-modal").classList.add("active");
-    }
+        /**
+         * Actualiza el estado local de la grilla en JS al editar desde la interfaz
+         */
+        function updateCell(workerIdx, dayIdx, value) {
+            appState.grid[workerIdx][dayIdx] = value;
+            // Dibuja de nuevo para actualizar clases visuales dinámicas (ej: contadores de F)
+            renderCalendar();
+        }
 
-    function closeAlertModal() {
-      document.getElementById("alert-modal").classList.remove("active");
-    }
+        /**
+         * Renderiza las tarjetas informativas de la configuración del personal
+         */
+        function renderConfigPanel() {
+            const panel = document.getElementById("config-panel");
+            panel.innerHTML = appState.workers.map((worker, idx) => {
+                const c = appState.config[idx] || {};
+                const catClass = "cat-" + (c.cat ? c.cat.replace(/\s+/g, "") : "Comodín2");
+                
+                return `
+                    <div class="config-card">
+                        <div class="config-header">
+                            <span>${worker}</span>
+                            <span class="badge ${catClass}">${c.cat || "Sin Categoría"}</span>
+                        </div>
+                        <div class="config-row"><span>Disponibilidad:</span> <strong>${c.disp || "Total"}</strong></div>
+                        <div class="config-row"><span>Preferencia:</span> <strong>${c.prefs ? c.prefs.join(", ") : "-"}</strong></div>
+                        <div class="config-row"><span>Límite NNFF:</span> <strong>${c.nnff ? "Activo (Bloques 2N+2F)" : "Inactivo"}</strong></div>
+                        <div class="config-row"><span>Findes Libres:</span> <strong>${c.weekends ? c.weekends + " Obligatorios" : "Estándar"}</strong></div>
+                    </div>
+                `;
+            }).join("");
+        }
 
-    /**
-     * Controladores Visuales Auxiliares
-     */
-    function toggleLoader(message) {
-      const wrapper = document.getElementById("calendar-wrapper");
-      wrapper.innerHTML = `<div class="loader-container"><div class="spinner"></div><p>${escapeHtml(message)}</p></div>`;
-    }
+        /**
+         * Vacía visualmente la matriz de turnos (mantiene estructura)
+         */
+        function clearGrid() {
+            if (confirm("¿Estás seguro de vaciar todo el cronograma en la vista actual? (No afectará Sheets hasta que guardes)")) {
+                appState.grid = appState.workers.map(() => appState.days.map(() => ""));
+                renderCalendar();
+            }
+        }
 
-    function toggleButtonsState(disabled) {
-      document.querySelectorAll(".toolbar .btn").forEach(btn => btn.disabled = disabled);
-    }
+        /**
+         * Dispara el autocompletado en el backend enviando la grilla manual actual
+         */
+        async function triggerAutocomplete() {
+            showLoader("Ejecutando motor heurístico de distribución en Apps Script...");
+            try {
+                const response = await fetch(GAS_WEB_APP_URL, {
+                    method: "POST",
+                    redirect: "follow",
+                    headers: { "Content-Type": "text/plain" }, // Crítico para evitar fallos de preflight OPTIONS
+                    body: JSON.stringify({ action: "autocomplete", grid: appState.grid })
+                });
 
-    function onServerFailure(error) {
-      toggleButtonsState(false);
-      alert(`Error en el servidor: ${error.message || error}`);
-      renderCalendarGrid();
-    }
+                const result = await response.json();
+                if (result.status === "error") throw new Error(result.message);
+                
+                appState.grid = result.grid;
+                renderCalendar();
+                
+                // Validación rápida en frontend para alertar si quedaron huecos
+                validateCoverage();
+            } catch (error) {
+                showAlert("Error en autocompletado: " + error.message);
+            } finally {
+                hideLoader();
+            }
+        }
 
-    function escapeHtml(str) {
-      return String(str)
-        .replace(/&/g, "&amp;")
-        .replace(/</g, "&lt;")
-        .replace(/>/g, "&gt;")
-        .replace(/"/g, "&quot;")
-        .replace(/'/g, "&#039;");
-    }
-  </script>
+        /**
+         * Guarda los datos de forma definitiva persistiendo en Sheets
+         */
+        async function saveData() {
+            showLoader("Guardando matriz completa en Google Sheets...");
+            try {
+                const response = await fetch(GAS_WEB_APP_URL, {
+                    method: "POST",
+                    redirect: "follow",
+                    headers: { "Content-Type": "text/plain" },
+                    body: JSON.stringify({ action: "save", grid: appState.grid })
+                });
+
+                const result = await response.json();
+                if (result.status === "error") throw new Error(result.message);
+                
+                alert("✅ " + result.message);
+            } catch (error) {
+                showAlert("Error al guardar: " + error.message);
+            } finally {
+                hideLoader();
+            }
+        }
+
+        /**
+         * Valida que se cumplan las coberturas mínimas diarias para emitir la alerta requerida
+         */
+        function validateCoverage() {
+            let insuficiencias = 0;
+            const numDays = appState.days.length;
+            
+            for (let d = 0; d < numDays; d++) {
+                let counts = { M: 0, T: 0, N: 0, RT: 0, RM: 0 };
+                for (let w = 0; w < appState.workers.length; w++) {
+                    const shift = appState.grid[w][d];
+                    if (counts[shift] !== undefined) counts[shift]++;
+                }
+                if (counts.M < 3 || counts.T < 3 || counts.N < 2 || counts.RT < 1 || counts.RM < 1) {
+                    insuficiencias++;
+                }
+            }
+
+            if (insuficiencias > 0) {
+                document.getElementById("modal-body").innerText = `El algoritmo detectó falta de personal en ${insuficiencias} días para cumplir las metas (3M, 3T, 2N, 1RT, 1RM). Las celdas descubiertas han sido marcadas como No Disponibles (-).`;
+                document.getElementById("modal").classList.add("active");
+            }
+        }
+
+        // Interfaces auxiliares de UI
+        function showLoader(txt) { document.getElementById("loader-text").innerText = txt; document.getElementById("loader").classList.add("active"); }
+        function hideLoader() { document.getElementById("loader").classList.remove("active"); }
+        function showAlert(msg) { document.getElementById("modal-body").innerText = msg; document.getElementById("modal").classList.add("active"); }
+        function closeModal() { document.getElementById("modal").classList.remove("active"); }
+    </script>
 </body>
 </html>
