@@ -154,12 +154,12 @@
 
     <h1>Cronograma - Gestion de personal</h1>
 
-    <div class="tabs">
-        <button class="tab-btn active" onclick="switchTab('mes-curso')">Mes en Curso</button>
-        <button class="tab-btn" onclick="switchTab('mes-entrante')">Mes Entrante</button>
-        <button class="tab-btn" onclick="switchTab('mes-vencido')">Mes Vencido</button>
-        <button class="tab-btn" onclick="switchTab('historial')">Historial / Archivo</button>
-    </div>
+ <div class="tabs">
+    <button class="tab-btn active" data-tab="mes-curso" onclick="switchTab('mes-curso')">Mes en Curso</button>
+    <button class="tab-btn" data-tab="mes-entrante" onclick="switchTab('mes-entrante')">Mes Entrante</button>
+    <button class="tab-btn" data-tab="mes-vencido" onclick="switchTab('mes-vencido')">Mes Vencido</button>
+    <button class="tab-btn" data-tab="historial" onclick="switchTab('historial')">Historial / Archivo</button>
+ </div>
 
     <div id="loader" class="loader">Procesando transacciones...</div>
 
