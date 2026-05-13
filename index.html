@@ -98,7 +98,7 @@
         th { background-color: #f1f3f4; }
         td[contenteditable="true"]:focus { outline: 2px solid var(--primary); }
 
-        /* RENDERIZADO VISUAL ESTRICTO (Fase 2) */
+        /* RENDERIZADO VISUAL ESTRICTO */
         td[data-shift="F"] { background-color: #333333 !important; color: #ffffff !important; }
         td[data-shift="N"] { background-color: #e0e0e0 !important; color: #000000 !important; }
         td[data-shift="T"], td[data-shift="M"], 
@@ -120,23 +120,17 @@
         .checkbox-group { display: flex; flex-wrap: wrap; gap: 6px; font-size: 11px; }
         .checkbox-group label { display: flex; align-items: center; gap: 2px; background:#f1f3f4; padding:2px 5px; border-radius:3px;}
         
-        .tag {
-            display: inline-block; padding: 3px 8px; border-radius: 12px; font-size: 11px; font-weight: bold;
-        }
+        .tag { display: inline-block; padding: 3px 8px; border-radius: 12px; font-size: 11px; font-weight: bold; }
         .tag-titular { background: #d4edda; color: #155724; }
         .tag-refuerzo { background: #cce5ff; color: #004085; }
         .tag-comodin { background: #fff3cd; color: #856404; }
         .tag-soporte { background: #f8d7da; color: #721c24; }
 
         /* BOTONES */
-        .actions-bar {
-            display: flex; justify-content: space-between; flex-wrap: wrap; gap: 10px; margin-top: 10px;
-        }
+        .actions-bar { display: flex; justify-content: space-between; flex-wrap: wrap; gap: 10px; margin-top: 10px; }
         .actions-group { display: flex; gap: 10px; }
         
-        .btn {
-            padding: 10px 18px; border-radius: 4px; border: none; cursor: pointer; font-weight: bold; font-size: 13px;
-        }
+        .btn { padding: 10px 18px; border-radius: 4px; border: none; cursor: pointer; font-weight: bold; font-size: 13px; }
         .btn-primary { background: var(--primary); color: white; }
         .btn-success { background: #28a745; color: white; }
         .btn-danger { background: #dc3545; color: white; }
@@ -154,12 +148,12 @@
 
     <h1>Cronograma - Gestion de personal</h1>
 
- <div class="tabs">
-    <button class="tab-btn active" data-tab="mes-curso" onclick="switchTab('mes-curso')">Mes en Curso</button>
-    <button class="tab-btn" data-tab="mes-entrante" onclick="switchTab('mes-entrante')">Mes Entrante</button>
-    <button class="tab-btn" data-tab="mes-vencido" onclick="switchTab('mes-vencido')">Mes Vencido</button>
-    <button class="tab-btn" data-tab="historial" onclick="switchTab('historial')">Historial / Archivo</button>
- </div>
+    <div class="tabs">
+        <button class="tab-btn active" data-tab="mes-curso" onclick="switchTab('mes-curso')">Mes en Curso</button>
+        <button class="tab-btn" data-tab="mes-entrante" onclick="switchTab('mes-entrante')">Mes Entrante</button>
+        <button class="tab-btn" data-tab="mes-vencido" onclick="switchTab('mes-vencido')">Mes Vencido</button>
+        <button class="tab-btn" data-tab="historial" onclick="switchTab('historial')">Historial / Archivo</button>
+    </div>
 
     <div id="loader" class="loader">Procesando transacciones...</div>
 
@@ -214,17 +208,15 @@
     </div>
 
     <script>
+        // ¡IMPORTANTE! Asegúrate de que esta URL sea la de tu última implementación configurada para "Cualquier persona"
         const WEB_APP_URL = "https://script.google.com/macros/s/AKfycbzP-qBzVytXwMXTU67z8i4MFUYENUvtVOgoBicXOv-b1-zGi4QgvoKj9gdu_jHJZEhg/exec";
         const SHIFTS = ["M", "T", "F", "N", "RT", "RM", "-"];
-        
-        // Memoria caché para verificar continuidad entre meses
         window.cacheSheets = {};
 
-        // Escucha global para aplicar estilos CSS dinámicos en tiempo real al escribir
+        // Escucha global de inputs para colorear celdas al escribir
         document.addEventListener('input', e => {
             if (e.target.hasAttribute('contenteditable')) {
                 let text = e.target.innerText.trim().toUpperCase();
-                // Validar si es una sigla permitida
                 if (SHIFTS.includes(text)) {
                     e.target.setAttribute('data-shift', text);
                 } else {
@@ -233,57 +225,54 @@
             }
         });
 
+        // Cambio de pestañas seguro (desvinculado del objeto event)
         function switchTab(tabId) {
-    // 1. Ocultar todos los contenidos y desmarcar todos los botones
-    document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active'));
-    document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
-    
-    // 2. Activar el contenedor de la pestaña actual
-    const targetContent = document.getElementById(tabId);
-    if (targetContent) targetContent.classList.add('active');
-    
-    // 3. Activar el botón correspondiente de forma segura (sin usar event)
-    const targetBtn = document.querySelector(`.tab-btn[data-tab="${tabId}"]`);
-    if (targetBtn) targetBtn.classList.add('active');
+            document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active'));
+            document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+            
+            const targetContent = document.getElementById(tabId);
+            if (targetContent) targetContent.classList.add('active');
+            
+            const targetBtn = document.querySelector(`.tab-btn[data-tab="${tabId}"]`);
+            if (targetBtn) targetBtn.classList.add('active');
 
-    // 4. Disparar la carga del espacio de trabajo correspondiente
-    if (tabId === 'mes-curso') loadWorkspace('Calendario mes en curso ', 'grid-curso', 'config-curso', true);
-    if (tabId === 'mes-entrante') loadWorkspace('Calendario mes entrante ', 'grid-entrante', 'config-entrante', true);
-    if (tabId === 'mes-vencido') loadWorkspace('Calendario vencido', 'grid-vencido', null, false);
-    if (tabId === 'historial') fetchHistory();
-}
+            if (tabId === 'mes-curso') loadWorkspace('Calendario mes en curso ', 'grid-curso', 'config-curso', true);
+            if (tabId === 'mes-entrante') loadWorkspace('Calendario mes entrante ', 'grid-entrante', 'config-entrante', true);
+            if (tabId === 'mes-vencido') loadWorkspace('Calendario vencido', 'grid-vencido', null, false);
+            if (tabId === 'historial') fetchHistory();
         }
 
         function showLoader(state) {
             document.getElementById('loader').style.display = state ? 'block' : 'none';
         }
 
-        /**
-         * CARGA DE ESPACIO DE TRABAJO (Grilla + Configuración)
-         */
+        // Carga robusta con manejo de errores del servidor
         async function loadWorkspace(sheetName, gridId, configId, editable) {
             showLoader(true);
             try {
                 const res = await fetch(`${WEB_APP_URL}?action=read&sheet=${encodeURIComponent(sheetName)}`);
                 const data = await res.json();
                 
-                window.cacheSheets[sheetName] = data; // Almacenar en caché para el algoritmo de continuidad
+                if (data.error) {
+                    alert(`Mensaje del Servidor: ${data.error}\n\nPor favor, verifica que la pestaña exista en tu Google Sheets.`);
+                    showLoader(false);
+                    return;
+                }
                 
+                window.cacheSheets[sheetName] = data;
                 renderGrid(data.gridValues, gridId, editable);
-                if (editable && configId) {
+                
+                if (editable && configId && data.gridValues && data.gridValues.length > 0) {
                     const employees = data.gridValues.slice(1).map(r => r[0]).filter(Boolean);
                     renderConfigPanel(employees, data.configValues, configId);
                 }
             } catch (err) {
-                console.error(err);
-                alert("Error de conexión al cargar la hoja.");
+                console.error("Error en Fetch:", err);
+                alert("No se pudo conectar con Google Apps Script.\nVerifica la consola (F12) para descartar bloqueos de permisos CORS.");
             }
             showLoader(false);
         }
 
-        /**
-         * RENDERIZAR GRILLA PRINCIPAL
-         */
         function renderGrid(matrix, containerId, editable) {
             if (!matrix || matrix.length === 0) return;
             let html = '<table>';
@@ -294,7 +283,6 @@
                     const tag = isHeader ? 'th' : 'td';
                     const editAttr = (editable && !isHeader && j > 0) ? 'contenteditable="true"' : '';
                     
-                    // Inyectar atributo dinámico para disparar CSS de colores
                     let shiftAttr = '';
                     let cleanCell = (cell || '').toString().trim();
                     if (!isHeader && j > 0 && SHIFTS.includes(cleanCell)) {
@@ -309,11 +297,7 @@
             document.getElementById(containerId).innerHTML = html;
         }
 
-        /**
-         * RENDERIZAR PANEL DE CONFIGURACIÓN UI
-         */
         function renderConfigPanel(employees, configRows, containerId) {
-            // Mapear configuración guardada por nombre de empleado
             const cfgMap = {};
             if (configRows && configRows.length > 1) {
                 configRows.slice(1).forEach(row => {
@@ -330,8 +314,6 @@
 
             employees.forEach(emp => {
                 const saved = cfgMap[emp] || [emp, "Disponible", "", "Titular", "M,T,F,N,RT,RM,-", "", "1", false, "1"];
-                
-                // Determinar clase visual de la etiqueta
                 let catClass = "tag-titular";
                 if (saved[3] === "Refuerzo") catClass = "tag-refuerzo";
                 if (saved[3].includes("Comodín")) catClass = "tag-comodin";
@@ -396,9 +378,6 @@
             if (select.value.includes('Soporte')) span.classList.add('tag-soporte');
         }
 
-        /**
-         * VACIAR CRONOGRAMA: Deja turnos en blanco conservando nombres y fechas.
-         */
         function clearSchedule(gridId) {
             if (!confirm("¿Seguro que deseas borrar todos los turnos asignados de esta grilla?")) return;
             const table = document.querySelector(`#${gridId} table`);
@@ -416,15 +395,10 @@
             });
         }
 
-        /**
-         * RECOLECTOR DOM -> ARRAY PARA GUARDADO
-         */
         async function saveFullState(sheetName, gridId, configId) {
-            // Extraer matriz de la tabla
             const gridTable = document.querySelector(`#${gridId} table`);
             const gridData = Array.from(gridTable.rows).map(r => Array.from(r.cells).map(c => c.innerText.trim()));
 
-            // Extraer configuración del panel
             const configRows = [
                 ["Empleado", "Disponibilidad", "Params_Disp", "Categoría", "Preferencias", "Cantidades", "Prioridad", "NNFF", "FinesDeSemana"]
             ];
@@ -449,10 +423,10 @@
                     body: JSON.stringify({ action: 'save', sheet: sheetName, gridData: gridData, configData: configRows })
                 });
                 const out = await res.json();
-                if (out.success) alert("Transacción exitosa: Matriz y configuración sincronizadas.");
+                if (out.success) alert("Transacción exitosa: Matriz y configuración guardadas en Sheets.");
             } catch(e) {
                 console.error(e);
-                alert("Error al intentar guardar los cambios.");
+                alert("Error al intentar sincronizar con Google Sheets.");
             }
             showLoader(false);
         }
@@ -466,37 +440,27 @@
             const data = await res.json();
             if (data.success) {
                 const gridId = offset === 0 ? 'grid-curso' : 'grid-entrante';
-                const configId = offset === 0 ? 'config-curso' : 'config-entrante';
                 renderGrid(data.data.gridValues, gridId, true);
-                // Mantiene configuración previa
             }
             showLoader(false);
         }
 
-        /**
-         * ====================================================================
-         * MOTOR DE AUTOCOMPLETADO INTELIGENTE (Fase 2 - CSP Heurístico JS)
-         * ====================================================================
-         */
+        // MOTOR CSP (Constraint Satisfaction)
         function runEngine(gridId, configId, sheetName) {
             const table = document.querySelector(`#${gridId} table`);
             if (!table) return;
 
-            // 1. Parsear estructura base y estado manual actual
             const gridMatrix = Array.from(table.rows).map(r => Array.from(r.cells).map(c => c.innerText.trim()));
             const headers = gridMatrix[0];
             const numDays = headers.length - 1;
             const employees = [];
-            
-            // Extraer iniciales de los días para identificar fines de semana
             const dayInitials = headers.slice(1).map(h => h.split('\n')[1]);
 
-            // 2. Extraer y estructurar reglas del panel de configuración
             const configMap = {};
             document.querySelectorAll(`#${configId} .config-table tr[data-employee]`).forEach((tr, idx) => {
                 const emp = tr.getAttribute('data-employee');
                 configMap[emp] = {
-                    index: idx + 1, // Fila en la matriz (1-based)
+                    index: idx + 1,
                     disp: tr.querySelector('.sel-disp').value,
                     params: tr.querySelector('.inp-params').value,
                     cat: tr.querySelector('.sel-cat').value,
@@ -505,45 +469,37 @@
                     nnff: tr.querySelector('.chk-nnff').checked,
                     targetWE: parseInt(tr.querySelector('.sel-we').value),
                     shiftsAssigned: { M:0, T:0, N:0, RT:0, RM:0, F:0, "-":0 },
-                    consecutiveWork: 0,
                     francoCount: 0
                 };
                 employees.push(emp);
             });
 
-            // 3. Validar Viabilidad Matemática Global
-            // Cuota requerida diaria: 3M + 3T + 2N + 1RT + 1RM = 10 empleados por día
             const activeStaffCount = employees.filter(e => configMap[e].disp !== 'No disponible').length;
             if (activeStaffCount < 10) {
-                alert(`¡ALERTA CRÍTICA DE VIABILIDAD!\nEl personal activo (${activeStaffCount}) es matemáticamente insuficiente para cubrir la cuota estándar obligatoria de 10 turnos diarios.`);
+                alert(`¡ALERTA DE VIABILIDAD!\nEl personal activo (${activeStaffCount}) es insuficiente para la cuota estándar obligatoria de 10 turnos por día.`);
                 return;
             }
 
-            // 4. Preprocesar estado inicial y bloqueos
             employees.forEach(emp => {
                 const cfg = configMap[emp];
                 const rIdx = cfg.index;
                 
-                // Excluir personal no disponible
                 if (cfg.disp === 'No disponible') {
                     for(let d=1; d<=numDays; d++) gridMatrix[rIdx][d] = "-";
                     return;
                 }
 
-                // Aplicar bloqueos de disponibilidad parcial
                 if (cfg.disp === 'Parcial' && cfg.params) {
                     const blockedDays = parseCustomRanges(cfg.params, numDays);
                     blockedDays.forEach(d => { if(d <= numDays) gridMatrix[rIdx][d] = "-"; });
                 }
 
-                // Forzar Fines de Semana Libres para Titulares
                 if (cfg.cat === 'Titular' && cfg.targetWE > 0) {
                     let weCount = 0;
                     for (let d = 1; d <= numDays; d++) {
                         if (dayInitials[d-1] === 'S' && d < numDays && dayInitials[d] === 'D') {
                             weCount++;
                             if (weCount <= cfg.targetWE) {
-                                // Aplicar franco si la celda no fue forzada manualmente con un turno
                                 if(!gridMatrix[rIdx][d]) gridMatrix[rIdx][d] = "F";
                                 if(!gridMatrix[rIdx][d+1]) gridMatrix[rIdx][d+1] = "F";
                             }
@@ -551,7 +507,6 @@
                     }
                 }
 
-                // Contabilizar pre-cargas manuales en la grilla
                 for (let d = 1; d <= numDays; d++) {
                     const val = gridMatrix[rIdx][d];
                     if (val && cfg.shiftsAssigned[val] !== undefined) {
@@ -561,7 +516,6 @@
                 }
             });
 
-            // Matriz de Prioridades Estándar por Categoría
             const rolePriorityMatrix = {
                 "M":  ["Titular", "Refuerzo", "Comodín 1", "Comodín 2", "Soporte nocturno"],
                 "T":  ["Titular", "Refuerzo", "Comodín 1", "Comodín 2", "Soporte nocturno"],
@@ -570,7 +524,6 @@
                 "N":  ["Titular", "Soporte nocturno", "Comodín 1", "Comodín 2", "Refuerzo"]
             };
 
-            // 5. NÚCLEO DEL SOLVER: Iteración día por día cubriendo las cuotas
             const dailyQuotas = [
                 { shift: "N",  count: 2 },
                 { shift: "M",  count: 3 },
@@ -580,45 +533,35 @@
             ];
 
             for (let d = 1; d <= numDays; d++) {
-                // Verificar qué cuotas ya están cubiertas por ediciones manuales
                 const currentDayCoverage = { N:0, M:0, T:0, RT:0, RM:0 };
                 employees.forEach(emp => {
                     const val = gridMatrix[configMap[emp].index][d];
                     if (currentDayCoverage[val] !== undefined) currentDayCoverage[val]++;
                 });
 
-                // Intentar asignar los turnos faltantes en orden crítico (Noches primero)
                 dailyQuotas.forEach(target => {
                     const shiftType = target.shift;
                     let missing = target.count - currentDayCoverage[shiftType];
                     
                     while (missing > 0) {
-                        // Buscar candidatos viables para este turno en este día
                         let candidates = employees.filter(emp => {
                             const cfg = configMap[emp];
                             const rIdx = cfg.index;
                             
-                            // Debe estar libre en la grilla
                             if (gridMatrix[rIdx][d] !== "") return false;
-                            // Debe tener el turno habilitado en preferencias
                             if (!cfg.prefs.includes(shiftType)) return false;
                             
-                            // Evaluar transición estricta: Prohibido M/RM/T a N sin F intermedio
                             if (shiftType === 'N' && d > 1) {
                                 const prevShift = gridMatrix[rIdx][d-1];
                                 if (["M", "T", "RM", "RT"].includes(prevShift)) return false;
                             }
 
-                            // Reglas de Noche para Titulares: Máximo 2 al mes
                             if (shiftType === 'N' && cfg.cat === 'Titular' && cfg.shiftsAssigned.N >= 2) return false;
 
-                            // Reglas de Noche Consecutiva (NNFF)
                             if (shiftType === 'N' && cfg.nnff) {
-                                // Requiere que el día siguiente también esté libre para meter el bloque
                                 if (d < numDays && gridMatrix[rIdx][d+1] !== "") return false;
                             }
 
-                            // Limitar trabajo continuo (evitar más de 5 días seguidos sin descanso)
                             let streak = 0;
                             for(let back = d-1; back > 0 && ["M","T","N","RT","RM"].includes(gridMatrix[rIdx][back]); back--) streak++;
                             if (streak >= 5) return false;
@@ -626,25 +569,20 @@
                             return true;
                         });
 
-                        // Si no hay candidatos puros, relajar restricciones temporalmente (Soft Constraints)
                         if (candidates.length === 0) {
-                            // Buscar a cualquiera que esté vacío y tenga la preferencia habilitada
                             candidates = employees.filter(emp => gridMatrix[configMap[emp].index][d] === "" && configMap[emp].prefs.includes(shiftType));
                         }
 
-                        // Si sigue siendo matemáticamente imposible cubrir el hueco, salir del loop
                         if (candidates.length === 0) break;
 
-                        // Ordenar candidatos combinando la jerarquía de roles y balance de carga
                         const roleHierarchy = rolePriorityMatrix[shiftType];
                         candidates.sort((a, b) => {
                             const rankA = roleHierarchy.indexOf(configMap[a].cat);
                             const rankB = roleHierarchy.indexOf(configMap[b].cat);
-                            if (rankA !== rankB) return rankA - rankB; // Prioridad de rol
-                            return configMap[a].shiftsAssigned[shiftType] - configMap[b].shiftsAssigned[shiftType]; // Balanceo equitativo
+                            if (rankA !== rankB) return rankA - rankB;
+                            return configMap[a].shiftsAssigned[shiftType] - configMap[b].shiftsAssigned[shiftType];
                         });
 
-                        // Asignar al mejor candidato
                         const selectedEmp = candidates[0];
                         const selCfg = configMap[selectedEmp];
                         const selRow = selCfg.index;
@@ -653,16 +591,11 @@
                         selCfg.shiftsAssigned[shiftType]++;
                         missing--;
 
-                        // Disparar inyección de bloques automáticos si aplica la regla NNFF
                         if (shiftType === 'N' && (selCfg.nnff || selCfg.cat === 'Titular')) {
-                            // Inyectar segunda noche consecutiva
                             if (d < numDays && gridMatrix[selRow][d+1] === "") {
                                 gridMatrix[selRow][d+1] = "N";
                                 selCfg.shiftsAssigned.N++;
-                                // Actualizar cobertura del día siguiente para no sobreasignar
-                                // (Se reajustará de forma nativa en la iteración de d+1)
                             }
-                            // Inyectar 2 Francos obligatorios post-bloque nocturno
                             if (d + 2 <= numDays && gridMatrix[selRow][d+2] === "") {
                                 gridMatrix[selRow][d+2] = "F";
                                 selCfg.francoCount++;
@@ -675,13 +608,11 @@
                     }
                 });
 
-                // Garantizar un mínimo de 2 Francos globales por día para el equipo
                 let francosToday = employees.filter(e => gridMatrix[configMap[e].index][d] === 'F').length;
                 if (francosToday < 2) {
                     let freeCandidates = employees.filter(e => gridMatrix[configMap[e].index][d] === "");
-                    // Priorizar otorgar franco a quienes lleven más días trabajados seguidos
                     freeCandidates.forEach(e => {
-                        if(francosToday < 3) { // Subir a un ideal de 3
+                        if(francosToday < 3) {
                             gridMatrix[configMap[e].index][d] = "F";
                             configMap[e].francoCount++;
                             francosToday++;
@@ -690,7 +621,6 @@
                 }
             }
 
-            // 6. POST-PROCESAMIENTO: Relleno de celdas vacías remanentes según rol
             employees.forEach(emp => {
                 const cfg = configMap[emp];
                 const rIdx = cfg.index;
@@ -698,28 +628,22 @@
                 for (let d = 1; d <= numDays; d++) {
                     if (gridMatrix[rIdx][d] === "") {
                         if (cfg.cat === 'Titular') {
-                            // Regla de Oro: Si supera 12 francos, la celda queda completamente en blanco en lugar de "F"
                             if (cfg.francoCount < 11) {
                                 gridMatrix[rIdx][d] = "F";
                                 cfg.francoCount++;
                             } else {
-                                gridMatrix[rIdx][d] = ""; // Excedente de descanso queda vacío
+                                gridMatrix[rIdx][d] = "";
                             }
                         } else {
-                            // Comodines y Soporte Nocturno rellenan sus huecos inactivos con "-"
                             gridMatrix[rIdx][d] = "-";
                         }
                     }
                 }
             });
 
-            // 7. Renderizar resultado final en el DOM y aplicar CSS en tiempo real
             renderGrid(gridMatrix, gridId, true);
         }
 
-        /**
-         * Función auxiliar para interpretar rangos manuales escritos (Ej: "5,12,15-18")
-         */
         function parseCustomRanges(inputStr, maxDays) {
             const days = new Set();
             if (!inputStr) return Array.from(days);
@@ -753,7 +677,7 @@
             showLoader(false);
         }
 
-        // Inicialización por defecto en la Pestaña 1
+        // Arranque inicial seguro
         switchTab('mes-curso');
     </script>
 </body>
