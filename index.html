@@ -234,15 +234,24 @@
         });
 
         function switchTab(tabId) {
-            document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active'));
-            document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
-            document.getElementById(tabId).classList.add('active');
-            event.currentTarget.classList.add('active');
+    // 1. Ocultar todos los contenidos y desmarcar todos los botones
+    document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active'));
+    document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+    
+    // 2. Activar el contenedor de la pestaña actual
+    const targetContent = document.getElementById(tabId);
+    if (targetContent) targetContent.classList.add('active');
+    
+    // 3. Activar el botón correspondiente de forma segura (sin usar event)
+    const targetBtn = document.querySelector(`.tab-btn[data-tab="${tabId}"]`);
+    if (targetBtn) targetBtn.classList.add('active');
 
-            if (tabId === 'mes-curso') loadWorkspace('Calendario mes en curso ', 'grid-curso', 'config-curso', true);
-            if (tabId === 'mes-entrante') loadWorkspace('Calendario mes entrante ', 'grid-entrante', 'config-entrante', true);
-            if (tabId === 'mes-vencido') loadWorkspace('Calendario vencido', 'grid-vencido', null, false);
-            if (tabId === 'historial') fetchHistory();
+    // 4. Disparar la carga del espacio de trabajo correspondiente
+    if (tabId === 'mes-curso') loadWorkspace('Calendario mes en curso ', 'grid-curso', 'config-curso', true);
+    if (tabId === 'mes-entrante') loadWorkspace('Calendario mes entrante ', 'grid-entrante', 'config-entrante', true);
+    if (tabId === 'mes-vencido') loadWorkspace('Calendario vencido', 'grid-vencido', null, false);
+    if (tabId === 'historial') fetchHistory();
+}
         }
 
         function showLoader(state) {
