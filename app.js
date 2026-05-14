@@ -1,4 +1,4 @@
-const API_URL = `https://script.google.com/macros/s/AKfycbzP-qBzVytXwMXTU67z8i4MFUYENUvtVOgoBicXOv-b1-zGi4QgvoKj9gdu_jHJZEhg/exec`.trim();
+const API_URL = `https://script.google.com/macros/s/AKfycbzcEZialBL-lDd7qT5njfbxojxeOVOTPnuBjKPgfHLItyLi54Kgw6ckzt3zpaCIvWCF/exec`.trim();
 
 const app = {
     data: { vencido: [], curso: [], entrante: [] },
