@@ -1,11 +1,21 @@
 const API_URL = "https://script.google.com/macros/s/AKfycbzP-qBzVytXwMXTU67z8i4MFUYENUvtVOgoBicXOv-b1-zGi4QgvoKj9gdu_jHJZEhg/exec
-"; // Reemplazar
+"; // Reemplazar con tu URL de despliegue real
 
 const app = {
     data: { vencido: [], curso: [], entrante: [] },
     configs: { curso: {}, entrante: {} },
     shifts: ["M", "T", "N", "RT", "RM", "F", "-"],
     
+    // --- NUEVA FUNCIÓN DE SANITIZACIÓN ---
+    escapeInlineJS: function(str) {
+        if (!str) return "";
+        return str.toString()
+                  .replace(/[\r\n]+/g, ' ') // Reemplaza saltos de línea por espacios
+                  .replace(/\\/g, '\\\\')   // Escapa barras
+                  .replace(/'/g, "\\'")     // Escapa comillas simples para el onchange
+                  .replace(/"/g, '&quot;'); // Escapa comillas dobles para atributos HTML
+    },
+
     init: async function() {
         this.bindEvents();
         await this.fetchData();
@@ -38,11 +48,16 @@ const app = {
         }
     },
 
+    // --- FUNCIÓN ACTUALIZADA (Limpia saltos de línea en Columna A) ---
     buildDefaultConfig: function(tab) {
         const matrix = this.data[tab];
-        for(let i=1; i<matrix.length; i++) {
+        for(let i = 1; i < matrix.length; i++) {
+            if(matrix[i][0]) {
+                matrix[i][0] = matrix[i][0].toString().replace(/[\r\n]+/g, ' ').trim();
+            }
             const name = matrix[i][0];
             if(!name) continue;
+            
             this.configs[tab][name] = {
                 disp: 'Disponible', dispDays: '', category: 'Titular',
                 prefs: { M:true, T:true, N:true, RT:true, RM:true, F:true },
@@ -61,6 +76,7 @@ const app = {
         this.loadHistorical();
     },
 
+    // --- FUNCIÓN ACTUALIZADA (Inyección segura en el DOM) ---
     renderTable: function(tab, readOnly) {
         const container = document.getElementById(`table-${tab}`);
         const matrix = this.data[tab];
@@ -72,14 +88,16 @@ const app = {
         });
         html += "</tr></thead><tbody>";
 
-        for(let i=1; i<matrix.length; i++) {
+        for(let i = 1; i < matrix.length; i++) {
             html += "<tr>";
             matrix[i].forEach((cell, j) => {
-                if(j === 0) html += `<td>${cell}</td>`;
-                else {
+                if(j === 0) {
+                    html += `<td>${cell}</td>`;
+                } else {
                     const val = cell || "";
+                    const safeVal = val.toString().replace(/"/g, '&quot;');
                     if(readOnly) html += `<td>${val}</td>`;
-                    else html += `<td><input type="text" data-row="${i}" data-col="${j}" data-tab="${tab}" value="${val}" onchange="app.updateCell(this)"></td>`;
+                    else html += `<td><input type="text" data-row="${i}" data-col="${j}" data-tab="${tab}" value="${safeVal}" onchange="app.updateCell(this)"></td>`;
                 }
             });
             html += "</tr>";
@@ -98,26 +116,45 @@ const app = {
         this.data[input.dataset.tab][input.dataset.row][input.dataset.col] = val;
     },
 
+    // --- FUNCIÓN ACTUALIZADA (Panel con persistencia de estado y variables seguras) ---
     renderConfigPanel: function(tab) {
         const container = document.getElementById(`panel-${tab}`);
         const conf = this.configs[tab];
         let html = "";
+        
+        const safeTab = this.escapeInlineJS(tab);
+
         for(let name in conf) {
+            const safeName = this.escapeInlineJS(name);
+            const workerConf = conf[name];
+            
             html += `
             <div class="worker-row">
                 <div class="worker-name">${name}</div>
-                <div><select onchange="app.updateConf('${tab}','${name}','disp', this.value)">
-                    <option value="Disponible">Disponible</option>
-                    <option value="Parcial">Disp. Parcial</option>
-                    <option value="No">No Disponible</option>
+                <div><select onchange="app.updateConf('${safeTab}','${safeName}','disp', this.value)">
+                    <option value="Disponible" ${workerConf.disp === 'Disponible' ? 'selected' : ''}>Disponible</option>
+                    <option value="Parcial" ${workerConf.disp === 'Parcial' ? 'selected' : ''}>Disp. Parcial</option>
+                    <option value="No" ${workerConf.disp === 'No' ? 'selected' : ''}>No Disponible</option>
                 </select></div>
-                <div><select onchange="app.updateConf('${tab}','${name}','category', this.value)">
-                    <option>Titular</option><option>Refuerzo</option><option>Comodín 1</option><option>Comodín 2</option><option>Soporte nocturno</option>
+                <div><select onchange="app.updateConf('${safeTab}','${safeName}','category', this.value)">
+                    <option ${workerConf.category === 'Titular' ? 'selected' : ''}>Titular</option>
+                    <option ${workerConf.category === 'Refuerzo' ? 'selected' : ''}>Refuerzo</option>
+                    <option ${workerConf.category === 'Comodín 1' ? 'selected' : ''}>Comodín 1</option>
+                    <option ${workerConf.category === 'Comodín 2' ? 'selected' : ''}>Comodín 2</option>
+                    <option ${workerConf.category === 'Soporte nocturno' ? 'selected' : ''}>Soporte nocturno</option>
                 </select></div>
-                <div>M<input type="checkbox" checked onchange="app.updatePref('${tab}','${name}','M', this.checked)"> T<input type="checkbox" checked onchange="app.updatePref('${tab}','${name}','T', this.checked)"> N<input type="checkbox" checked onchange="app.updatePref('${tab}','${name}','N', this.checked)"></div>
+                <div>
+                    M<input type="checkbox" ${workerConf.prefs.M ? 'checked' : ''} onchange="app.updatePref('${safeTab}','${safeName}','M', this.checked)"> 
+                    T<input type="checkbox" ${workerConf.prefs.T ? 'checked' : ''} onchange="app.updatePref('${safeTab}','${safeName}','T', this.checked)"> 
+                    N<input type="checkbox" ${workerConf.prefs.N ? 'checked' : ''} onchange="app.updatePref('${safeTab}','${safeName}','N', this.checked)">
+                </div>
                 <div>Prioridades (Auto)</div>
-                <div>NNFF <input type="checkbox" onchange="app.updateConf('${tab}','${name}','nnff', this.checked)"></div>
-                <div>Fines de semana <select onchange="app.updateConf('${tab}','${name}','weekends', this.value)"><option>1</option><option>2</option><option>3</option></select></div>
+                <div>NNFF <input type="checkbox" ${workerConf.nnff ? 'checked' : ''} onchange="app.updateConf('${safeTab}','${safeName}','nnff', this.checked)"></div>
+                <div>Fines de semana <select onchange="app.updateConf('${safeTab}','${safeName}','weekends', this.value)">
+                    <option ${workerConf.weekends === '1' ? 'selected' : ''}>1</option>
+                    <option ${workerConf.weekends === '2' ? 'selected' : ''}>2</option>
+                    <option ${workerConf.weekends === '3' ? 'selected' : ''}>3</option>
+                </select></div>
             </div>`;
         }
         container.innerHTML = html;
@@ -135,7 +172,6 @@ const app = {
         const matrix = this.data[tab];
         matrix[0][0] = `${mes}\n${año}`;
         
-        // Ajustar columnas
         matrix[0].length = daysInMonth + 1;
         for(let j=1; j<=daysInMonth; j++) {
             const date = new Date(año, this.getMonthIndex(mes), j);
@@ -174,46 +210,40 @@ const app = {
         }
     },
 
-    // MOTOR DE AUTOCOMPLETADO (Constraint Evaluator & Greedy Allocator)
     autoComplete: function(tab) {
         const matrix = this.data[tab];
         const conf = this.configs[tab];
         const rows = matrix.length;
         const cols = matrix[0].length;
         
-        // 1. Validación Matemática (Cuota: 3M, 3T, 2N, 1RT, 1RM = 10 turnos/día)
         let disponibles = 0;
         for(let name in conf) { if(conf[name].disp !== 'No') disponibles++; }
         
-        if (disponibles < 12) { // Necesitas margen para francos (10 trabajando + 2 francos min)
+        if (disponibles < 12) { 
             this.showAlert("Error Matemático", `Personal insuficiente. Se requieren mínimo 12 personas activas para cubrir cuotas y descansos diarios. Disponibles: ${disponibles}.`);
             return;
         }
 
-        // 2. Ejecución de Asignación por Día
         const cuotasDiarias = { M:3, T:3, N:2, RT:1, RM:1 };
         
         for (let day = 1; day < cols; day++) {
             let asignadosHoy = { M:0, T:0, N:0, RT:0, RM:0, F:0 };
             
-            // Leer celdas manuales
             for (let i = 1; i < rows; i++) {
                 const val = matrix[i][day];
                 if (val && asignadosHoy[val] !== undefined) asignadosHoy[val]++;
             }
 
-            // Asignar faltantes según jerarquía y cuota
             for (let shift in cuotasDiarias) {
                 while (asignadosHoy[shift] < cuotasDiarias[shift]) {
                     let bestWorkerIdx = this.findBestWorkerForShift(matrix, conf, day, shift);
-                    if (bestWorkerIdx === -1) break; // Imposible cumplir restricción, pasar a siguiente
+                    if (bestWorkerIdx === -1) break; 
                     
                     matrix[bestWorkerIdx][day] = shift;
                     asignadosHoy[shift]++;
                 }
             }
 
-            // Rellenar F y - 
             for (let i = 1; i < rows; i++) {
                 const name = matrix[i][0];
                 if (!matrix[i][day]) {
@@ -234,21 +264,17 @@ const app = {
             const name = matrix[i][0];
             const workerConf = conf[name];
 
-            // Filtros duros
-            if (matrix[i][day]) continue; // Ya tiene turno
+            if (matrix[i][day]) continue; 
             if (workerConf.disp === 'No') continue;
             if (!workerConf.prefs[shift]) continue;
             
-            // Regla de transición (Evitar M/T -> N sin franco)
             const yesterday = day > 1 ? matrix[i][day-1] : "";
             if (shift === 'N' && (yesterday === 'M' || yesterday === 'T')) continue;
 
-            // Regla NNFF
             if (workerConf.nnff && shift === 'N') {
-                if (yesterday === 'N' && day > 2 && matrix[i][day-2] === 'N') continue; // Ya hizo 2 noches
+                if (yesterday === 'N' && day > 2 && matrix[i][day-2] === 'N') continue; 
             }
 
-            // Scoring (Prioridades)
             let score = 0;
             if (shift === 'M' || shift === 'T') {
                 if (workerConf.category === 'Titular') score += 10;
@@ -258,7 +284,6 @@ const app = {
                 if (workerConf.category === 'Soporte nocturno' || workerConf.category === 'Titular') score += 10;
             }
             
-            // Prioridad a los que descansaron ayer
             if (yesterday === 'F') score += 5;
 
             if (score > bestScore) {
