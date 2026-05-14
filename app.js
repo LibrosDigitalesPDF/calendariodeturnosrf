@@ -1,4 +1,4 @@
-const API_URL = "https://script.google.com/macros/s/AKfycbzP-qBzVytXwMXTU67z8i4MFUYENUvtVOgoBicXOv-b1-zGi4QgvoKj9gdu_jHJZEhg/exec"; // Reemplazar con tu URL real
+const API_URL = `https://script.google.com/macros/s/AKfycbzP-qBzVytXwMXTU67z8i4MFUYENUvtVOgoBicXOv-b1-zGi4QgvoKj9gdu_jHJZEhg/exec`.trim();
 
 const app = {
     data: { vencido: [], curso: [], entrante: [] },
@@ -114,7 +114,6 @@ const app = {
         this.data[input.dataset.tab][input.dataset.row][input.dataset.col] = val;
     },
 
-    // REFACTORIZACIÓN ARQUITECTÓNICA: Uso estricto de data-attributes pasados por 'this'
     renderConfigPanel: function(tab) {
         const container = document.getElementById(`panel-${tab}`);
         const conf = this.configs[tab];
@@ -158,7 +157,6 @@ const app = {
         container.innerHTML = html;
     },
 
-    // Las funciones ahora reciben el elemento DOM directamente y extraen su dataset de forma segura
     updateConf: function(el) { 
         const tab = el.dataset.tab;
         const name = el.dataset.name;
