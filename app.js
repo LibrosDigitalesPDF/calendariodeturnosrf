@@ -1,19 +1,19 @@
 const API_URL = "https://script.google.com/macros/s/AKfycbzP-qBzVytXwMXTU67z8i4MFUYENUvtVOgoBicXOv-b1-zGi4QgvoKj9gdu_jHJZEhg/exec
-"; // Reemplazar con tu URL de despliegue real
+"; // Reemplazar con tu URL real
 
 const app = {
     data: { vencido: [], curso: [], entrante: [] },
     configs: { curso: {}, entrante: {} },
     shifts: ["M", "T", "N", "RT", "RM", "F", "-"],
     
-    // --- NUEVA FUNCIÓN DE SANITIZACIÓN ---
-    escapeInlineJS: function(str) {
+    // Convertimos strings para que sean 100% seguros dentro de atributos HTML nativos
+    escapeAttr: function(str) {
         if (!str) return "";
         return str.toString()
-                  .replace(/[\r\n]+/g, ' ') // Reemplaza saltos de línea por espacios
-                  .replace(/\\/g, '\\\\')   // Escapa barras
-                  .replace(/'/g, "\\'")     // Escapa comillas simples para el onchange
-                  .replace(/"/g, '&quot;'); // Escapa comillas dobles para atributos HTML
+                  .replace(/&/g, '&amp;')
+                  .replace(/"/g, '&quot;')
+                  .replace(/'/g, '&#39;')
+                  .replace(/[\r\n\u2028\u2029]+/g, ' '); // Destruye cualquier salto de línea oculto
     },
 
     init: async function() {
@@ -48,12 +48,12 @@ const app = {
         }
     },
 
-    // --- FUNCIÓN ACTUALIZADA (Limpia saltos de línea en Columna A) ---
     buildDefaultConfig: function(tab) {
         const matrix = this.data[tab];
         for(let i = 1; i < matrix.length; i++) {
+            // Limpieza profunda de la celda de Sheets antes de usarla como clave JS
             if(matrix[i][0]) {
-                matrix[i][0] = matrix[i][0].toString().replace(/[\r\n]+/g, ' ').trim();
+                matrix[i][0] = matrix[i][0].toString().replace(/[\r\n\u2028\u2029]+/g, ' ').trim();
             }
             const name = matrix[i][0];
             if(!name) continue;
@@ -76,14 +76,13 @@ const app = {
         this.loadHistorical();
     },
 
-    // --- FUNCIÓN ACTUALIZADA (Inyección segura en el DOM) ---
     renderTable: function(tab, readOnly) {
         const container = document.getElementById(`table-${tab}`);
         const matrix = this.data[tab];
         if(!matrix || matrix.length === 0) { container.innerHTML = "<p>Sin datos</p>"; return; }
 
         let html = "<table><thead><tr>";
-        matrix[0].forEach((cell, j) => {
+        matrix[0].forEach((cell) => {
             html += `<th>${cell}</th>`;
         });
         html += "</tr></thead><tbody>";
@@ -95,7 +94,7 @@ const app = {
                     html += `<td>${cell}</td>`;
                 } else {
                     const val = cell || "";
-                    const safeVal = val.toString().replace(/"/g, '&quot;');
+                    const safeVal = this.escapeAttr(val);
                     if(readOnly) html += `<td>${val}</td>`;
                     else html += `<td><input type="text" data-row="${i}" data-col="${j}" data-tab="${tab}" value="${safeVal}" onchange="app.updateCell(this)"></td>`;
                 }
@@ -116,27 +115,27 @@ const app = {
         this.data[input.dataset.tab][input.dataset.row][input.dataset.col] = val;
     },
 
-    // --- FUNCIÓN ACTUALIZADA (Panel con persistencia de estado y variables seguras) ---
+    // REFACTORIZACIÓN ARQUITECTÓNICA: Uso estricto de data-attributes pasados por 'this'
     renderConfigPanel: function(tab) {
         const container = document.getElementById(`panel-${tab}`);
         const conf = this.configs[tab];
         let html = "";
         
-        const safeTab = this.escapeInlineJS(tab);
+        const safeTab = this.escapeAttr(tab);
 
         for(let name in conf) {
-            const safeName = this.escapeInlineJS(name);
+            const safeName = this.escapeAttr(name);
             const workerConf = conf[name];
             
             html += `
             <div class="worker-row">
                 <div class="worker-name">${name}</div>
-                <div><select onchange="app.updateConf('${safeTab}','${safeName}','disp', this.value)">
+                <div><select data-tab="${safeTab}" data-name="${safeName}" data-key="disp" onchange="app.updateConf(this)">
                     <option value="Disponible" ${workerConf.disp === 'Disponible' ? 'selected' : ''}>Disponible</option>
                     <option value="Parcial" ${workerConf.disp === 'Parcial' ? 'selected' : ''}>Disp. Parcial</option>
                     <option value="No" ${workerConf.disp === 'No' ? 'selected' : ''}>No Disponible</option>
                 </select></div>
-                <div><select onchange="app.updateConf('${safeTab}','${safeName}','category', this.value)">
+                <div><select data-tab="${safeTab}" data-name="${safeName}" data-key="category" onchange="app.updateConf(this)">
                     <option ${workerConf.category === 'Titular' ? 'selected' : ''}>Titular</option>
                     <option ${workerConf.category === 'Refuerzo' ? 'selected' : ''}>Refuerzo</option>
                     <option ${workerConf.category === 'Comodín 1' ? 'selected' : ''}>Comodín 1</option>
@@ -144,13 +143,13 @@ const app = {
                     <option ${workerConf.category === 'Soporte nocturno' ? 'selected' : ''}>Soporte nocturno</option>
                 </select></div>
                 <div>
-                    M<input type="checkbox" ${workerConf.prefs.M ? 'checked' : ''} onchange="app.updatePref('${safeTab}','${safeName}','M', this.checked)"> 
-                    T<input type="checkbox" ${workerConf.prefs.T ? 'checked' : ''} onchange="app.updatePref('${safeTab}','${safeName}','T', this.checked)"> 
-                    N<input type="checkbox" ${workerConf.prefs.N ? 'checked' : ''} onchange="app.updatePref('${safeTab}','${safeName}','N', this.checked)">
+                    M<input type="checkbox" data-tab="${safeTab}" data-name="${safeName}" data-shift="M" ${workerConf.prefs.M ? 'checked' : ''} onchange="app.updatePref(this)"> 
+                    T<input type="checkbox" data-tab="${safeTab}" data-name="${safeName}" data-shift="T" ${workerConf.prefs.T ? 'checked' : ''} onchange="app.updatePref(this)"> 
+                    N<input type="checkbox" data-tab="${safeTab}" data-name="${safeName}" data-shift="N" ${workerConf.prefs.N ? 'checked' : ''} onchange="app.updatePref(this)">
                 </div>
                 <div>Prioridades (Auto)</div>
-                <div>NNFF <input type="checkbox" ${workerConf.nnff ? 'checked' : ''} onchange="app.updateConf('${safeTab}','${safeName}','nnff', this.checked)"></div>
-                <div>Fines de semana <select onchange="app.updateConf('${safeTab}','${safeName}','weekends', this.value)">
+                <div>NNFF <input type="checkbox" data-tab="${safeTab}" data-name="${safeName}" data-key="nnff" ${workerConf.nnff ? 'checked' : ''} onchange="app.updateConf(this)"></div>
+                <div>Fines de semana <select data-tab="${safeTab}" data-name="${safeName}" data-key="weekends" onchange="app.updateConf(this)">
                     <option ${workerConf.weekends === '1' ? 'selected' : ''}>1</option>
                     <option ${workerConf.weekends === '2' ? 'selected' : ''}>2</option>
                     <option ${workerConf.weekends === '3' ? 'selected' : ''}>3</option>
@@ -160,8 +159,21 @@ const app = {
         container.innerHTML = html;
     },
 
-    updateConf: function(tab, name, key, val) { this.configs[tab][name][key] = val; },
-    updatePref: function(tab, name, shift, val) { this.configs[tab][name].prefs[shift] = val; },
+    // Las funciones ahora reciben el elemento DOM directamente y extraen su dataset de forma segura
+    updateConf: function(el) { 
+        const tab = el.dataset.tab;
+        const name = el.dataset.name;
+        const key = el.dataset.key;
+        const val = el.type === 'checkbox' ? el.checked : el.value;
+        this.configs[tab][name][key] = val; 
+    },
+    
+    updatePref: function(el) { 
+        const tab = el.dataset.tab;
+        const name = el.dataset.name;
+        const shift = el.dataset.shift;
+        this.configs[tab][name].prefs[shift] = el.checked; 
+    },
 
     initMonth: function(tab) {
         const mes = prompt("Ingrese MES (ej: ENERO):", "").toUpperCase();
